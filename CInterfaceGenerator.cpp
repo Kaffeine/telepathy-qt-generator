@@ -64,7 +64,17 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
     } else if (type ==QLatin1String("a{sv}")) {
         m_type = QLatin1String("QVariantMap");
     } else {
-        qDebug() << "Unknown type:" << type << tpType;
+        if (tpType == QLatin1String("Field_Spec[]") && type == QLatin1String("a(sasuu)")) {
+            m_type = QLatin1String("Tp::FieldSpecs");
+        } else if (tpType == QLatin1String("Contact_Info_Map") && type == QLatin1String("a{ua(sasas)}")) {
+            m_type = QLatin1String("Tp::ContactInfoMap");
+        } else if (tpType == QLatin1String("Contact_Handle[]") && type == QLatin1String("au")) {
+            m_type = QLatin1String("Tp::UIntList");
+        } else if (tpType == QLatin1String("Contact_Info_Field[]") && type == QLatin1String("a(sasas)")) {
+            m_type = QLatin1String("Tp::ContactInfoFieldList");
+        } else {
+            qDebug() << "Unknown type:" << type << tpType;
+        }
     }
 }
 
