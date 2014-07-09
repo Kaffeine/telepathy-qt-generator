@@ -444,25 +444,35 @@ QString CInterfaceGenerator::generatePrivateHeader() const
 
     result += QLatin1Char('\n');
 
-    foreach (const CInterfaceProperty *prop, m_properties) {
-        result += spacing + QString(QLatin1String("%1 %2() const;\n")).arg(prop->type()).arg(prop->name());
-    }
-    result += QLatin1Char('\n');
-    result += QLatin1String("private Q_SLOTS:\n");
+    if (!m_properties.isEmpty()) {
+        foreach (const CInterfaceProperty *prop, m_properties) {
+            result += spacing + QString(QLatin1String("%1 %2() const;\n")).arg(prop->type()).arg(prop->name());
+        }
 
-    foreach (const CInterfaceMethod *method, m_methods) {
-        result += spacing + QString(QLatin1String("void %1(%2\n")).arg(method->name())
-                .arg(method->arguments.isEmpty() ? QString() : formatArguments(method, /* name */ true, /* hideOutput */ true) + QLatin1String(","));
-        result += spacing + spacing + spacing + QString(QLatin1String("const Tp::Service::%1Interface%2Adaptor::%3ContextPtr &context);\n")).arg(interfaceType()).arg(name()).arg(method->nameAsIs());
+        result += QLatin1Char('\n');
     }
 
-    result += QLatin1Char('\n');
-    result += QLatin1String("signals:\n");
-    foreach (const CInterfaceSignal *sig, m_signals) {
-        result += spacing + QString(QLatin1String("void %1(%2);\n")).arg(sig->name()).arg(formatArguments(sig, /* name */ true));
+    if (!m_methods.isEmpty()) {
+        result += QLatin1String("private Q_SLOTS:\n");
+
+        foreach (const CInterfaceMethod *method, m_methods) {
+            result += spacing + QString(QLatin1String("void %1(%2\n")).arg(method->name())
+                    .arg(method->arguments.isEmpty() ? QString() : formatArguments(method, /* name */ true, /* hideOutput */ true) + QLatin1String(","));
+            result += spacing + spacing + spacing + QString(QLatin1String("const Tp::Service::%1Interface%2Adaptor::%3ContextPtr &context);\n")).arg(interfaceType()).arg(name()).arg(method->nameAsIs());
+        }
+
+        result += QLatin1Char('\n');
     }
 
-    result += QLatin1Char('\n');
+    if (!m_signals.isEmpty()) {
+        result += QLatin1String("signals:\n");
+        foreach (const CInterfaceSignal *sig, m_signals) {
+            result += spacing + QString(QLatin1String("void %1(%2);\n")).arg(sig->name()).arg(formatArguments(sig, /* name */ true));
+        }
+
+        result += QLatin1Char('\n');
+    }
+
     result += QLatin1String("public:\n");
     result += spacing + QString(QLatin1String("%1 *mInterface;\n")).arg(interfaceClassName());
 
