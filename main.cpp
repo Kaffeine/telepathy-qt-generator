@@ -1,0 +1,129 @@
+#include <QDebug>
+
+#include <QFile>
+#include <QDomDocument>
+#include <QStringList>
+#include <QCoreApplication>
+
+#include "CInterfaceGenerator.hpp"
+
+void processSpec(const QString &fileName)
+{
+    QFile xmlFile(fileName);
+    xmlFile.open(QIODevice::ReadOnly);
+
+    QDomDocument document;
+    document.setContent(xmlFile.readAll());
+    xmlFile.close();
+
+    const QDomElement interfaceElement = document.documentElement().firstChildElement(QLatin1String("interface"));
+    QString interfaceName = interfaceElement.attribute(QLatin1String("name"));
+    if (!interfaceName.startsWith(QLatin1String("org.freedesktop.Telepathy."))) {
+        qDebug() << "File doesn't contain telepathy spec in known format (Error 1)";
+        return;
+    }
+
+    const QStringList interfaceNameParts = interfaceName.split(QLatin1Char('.'));
+    if (interfaceNameParts.count() != 6) {
+        qDebug() << "File doesn't contain telepathy spec in known format (Error 2)";
+        return;
+    }
+
+    if (interfaceNameParts.at(4) != QLatin1String("Interface")) {
+        qDebug() << "Spec is not interface spec. (Error 3)";
+        return;
+    }
+
+    CInterfaceGenerator generator;
+    generator.setName(interfaceNameParts.at(5));
+    generator.setType(interfaceNameParts.at(3));
+    generator.setNode(document.documentElement().attribute(QLatin1String("name")));
+
+    QDomElement propertyElement = interfaceElement.firstChildElement(QLatin1String("property"));
+
+    while (!propertyElement.isNull()) {
+        CInterfaceProperty *property = new CInterfaceProperty();
+        property->setName(propertyElement.attribute(QLatin1String("name")));
+        property->setTypeFromStr(propertyElement.attribute(QLatin1String("type")), propertyElement.attribute(QLatin1String("tp:type")));
+        property->setImmutable(propertyElement.attribute(QLatin1String("tp:immutable")) == QLatin1String("yes"));
+
+        generator.m_properties.append(property);
+
+        propertyElement = propertyElement.nextSiblingElement(QLatin1String("property"));
+    }
+
+
+    QDomElement methodElement = interfaceElement.firstChildElement(QLatin1String("method"));
+
+    while (!methodElement.isNull()) {
+        CInterfaceMethod *method = new CInterfaceMethod(methodElement.attribute(QLatin1String("name")));
+
+        QDomElement argElement = methodElement.firstChildElement(QLatin1String("arg"));
+
+        while (!argElement.isNull()) {
+            CMethodArgument arg;
+            arg.setName(argElement.attribute(QLatin1String("name")));
+            arg.setTypeFromStr(argElement.attribute(QLatin1String("type")), argElement.attribute(QLatin1String("tp:type")));
+            arg.setDirection(argElement.attribute(QLatin1String("direction")));
+
+            method->arguments.append(arg);
+
+            argElement = argElement.nextSiblingElement(QLatin1String("arg"));
+        }
+
+        generator.m_methods.append(method);
+
+        methodElement = methodElement.nextSiblingElement(QLatin1String("method"));
+    }
+
+
+    QDomElement signalElement = interfaceElement.firstChildElement(QLatin1String("signal"));
+
+    while (!signalElement.isNull()) {
+        CInterfaceSignal *signal = new CInterfaceSignal(signalElement.attribute(QLatin1String("name")));
+
+        QDomElement argElement = signalElement.firstChildElement(QLatin1String("arg"));
+
+        while (!argElement.isNull()) {
+            CMethodArgument arg;
+            arg.setName(argElement.attribute(QLatin1String("name")));
+            arg.setTypeFromStr(argElement.attribute(QLatin1String("type")), argElement.attribute(QLatin1String("tp:type")));
+            arg.setDirection(argElement.attribute(QLatin1String("direction")));
+
+            signal->arguments.append(arg);
+
+            argElement = argElement.nextSiblingElement(QLatin1String("arg"));
+        }
+
+        generator.m_signals.append(signal);
+
+        signalElement = signalElement.nextSiblingElement(QLatin1String("signal"));
+    }
+
+    generator.prepare();
+
+    printf("Generated code for %s spec\n\n", fileName.toLocal8Bit().constData());
+
+    printf("--- Public header: ---\n");
+    printf("%s", generator.generatePublicHeader().toLocal8Bit().constData());
+    printf("--- Private (internal) header: ---\n");
+    printf("%s", generator.generatePrivateHeader().toLocal8Bit().constData());
+    printf("--- Source file: ---\n");
+    printf("%s", generator.generateImplementation().toLocal8Bit().constData());
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc < 2) {
+        printf("Usage: %s <specs file>\n", argv[0]);
+        return 0;
+    }
+
+    QCoreApplication app(argc, argv);
+
+    static const QStringList arguments = app.arguments();
+
+    processSpec(arguments.at(1));
+
+    return 0;
+}

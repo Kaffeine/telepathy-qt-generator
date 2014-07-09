@@ -1,0 +1,167 @@
+#ifndef CINTERFACEGENERATOR_HPP
+#define CINTERFACEGENERATOR_HPP
+
+#include <QString>
+#include <QList>
+
+class CNameFeature {
+public:
+    CNameFeature() { }
+    CNameFeature(const QString &newName) { setName(newName); }
+    CNameFeature(const CNameFeature &another) : m_name(another.name()) { }
+    inline QString name() const { return m_name; }
+    inline QString nameAsIs() const { return m_nameAsIs; }
+    QString nameFirstCapital() const;
+
+    void setName(const QString &newName);
+
+private:
+    QString m_name;
+    QString m_nameAsIs;
+};
+
+class CTypeFeature : public CNameFeature {
+public:
+    CTypeFeature() { }
+    CTypeFeature(const CTypeFeature &another) : CNameFeature(another), m_type(another.m_type) { }
+
+    inline QString type() const { return m_type; }
+    inline QString defaultValue() const { return m_defaultValue; }
+
+    void setTypeFromStr(const QString &type, const QString &tpType);
+
+    bool isPod() const;
+    QString formatArgument(bool addName) const;
+
+private:
+    QString m_type;
+    QString m_defaultValue;
+
+};
+
+class CMethodArgument : public CTypeFeature {
+public:
+    enum Direction {
+        Input,
+        Output,
+        Invalid
+    };
+
+    CMethodArgument() : CTypeFeature(), m_direction(Invalid) { }
+    CMethodArgument(const CMethodArgument &arg) : CTypeFeature(arg), m_direction(arg.m_direction) { }
+
+    inline Direction direction() const { return m_direction; }
+
+    void setDirection(const QString &directionStr);
+
+private:
+    Direction m_direction;
+};
+
+class CArgumentsFeature
+{
+public:
+    QList<CMethodArgument> arguments;
+
+};
+
+class CInterfaceSignal : public CNameFeature, public CArgumentsFeature {
+public:
+    CInterfaceSignal(const QString &name);
+
+    inline bool isNotifier() const { return m_isNotifier; }
+    void setNotifierFlag(bool isNotifier);
+
+private:
+    bool m_isNotifier;
+
+};
+
+class CInterfaceProperty : public CTypeFeature {
+public:
+    CInterfaceProperty() : CTypeFeature(), m_notifier(0), m_immutable(false) { }
+    CInterfaceProperty(const CInterfaceProperty &prop) : CTypeFeature(prop), m_notifier(prop.m_notifier), m_immutable(prop.m_immutable) { }
+
+    inline CInterfaceSignal *notifier() const { return m_notifier; }
+    void setNotifier(CInterfaceSignal *notifier);
+    inline bool isImmutable() const { return m_immutable; }
+    void setImmutable(bool newImmutable);
+
+private:
+    CInterfaceSignal *m_notifier;
+    bool m_immutable;
+
+};
+
+class CInterfaceMethod : public CNameFeature, public CArgumentsFeature  {
+public:
+    CInterfaceMethod(const QString &name);
+    inline QString callback() const { return nameAsIs() + QLatin1String("Callback"); }
+    inline QString callbackMember() const { return name() + QLatin1String("CB"); }
+    inline QString callbackRetType() const { return m_callbackRetType; }
+
+    void prepare();
+
+private:
+    QString m_callbackRetType;
+
+};
+
+class CInterfaceGenerator
+{
+public:
+    enum InterfaceType {
+        InterfaceTypeChannel,
+        InterfaceTypeConnection,
+        InterfaceTypeProtocol,
+        InterfaceTypeInvalid
+    };
+
+    CInterfaceGenerator();
+
+    QString interfaceClassName() const;
+    QString interfacePtr() const;
+    QString interfaceSubclass() const;
+    QString interfaceType() const;
+
+    QString interfaceTpDefinition() const;
+
+    static InterfaceType strToType(const QString &str);
+
+    inline QString name() const { return m_name; }
+    void setName(const QString &name);
+
+    inline QString node() const { return m_node; }
+    void setNode(const QString &node);
+
+    void setType(const QString &interfaceType);
+
+    void prepare();
+    QString generatePublicHeader() const;
+    QString generatePrivateHeader() const;
+    QString generateImplementation() const;
+
+    QList<CInterfaceSignal*> m_signals;
+    QList<CInterfaceProperty*> m_properties;
+    QList<CInterfaceMethod*> m_methods;
+private:
+    QString generateImplementationAdaptee() const;
+    QString generateImplementationPrivate() const;
+    QString generateImplementationInterface() const;
+
+    QString generateImmutablePropertiesListHelper(const int creatorSpacing, bool names, bool signatures) const;
+    QString generatePrivateConstructorPropertiesList(const int creatorSpacing) const;
+    QString generateMethodCallbackAndDeclaration(const CInterfaceMethod *method) const;
+    QString formatArguments(const CArgumentsFeature *argumentsClass, bool argName, bool hideOutputArguments = false, bool addType = true) const;
+    QString formatArgument(const CMethodArgument &arg, bool addName) const;
+    QString formatInvokeMethodArguments(const CArgumentsFeature *argumentsClass) const;
+    InterfaceType m_type;
+    QString m_node;
+    QString m_name;
+
+    int m_mutablePropertiesCount;
+    int m_immutablePropertiesCount;
+
+};
+
+#endif // CINTERFACEGENERATOR_HPP
