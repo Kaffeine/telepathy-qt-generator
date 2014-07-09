@@ -516,13 +516,36 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
 
         result += spacing + QString(QLatin1String("qDebug() << \"%1::%2\";\n")).arg(className).arg(method->name());
         result += spacing + QLatin1String("DBusError error;\n");
-        result += spacing + QString(QLatin1String("mInterface->mPriv->%1(%2&error);\n")).arg(method->callbackMember())
-                .arg(method->arguments.isEmpty() ? QString() : formatArguments(method, /* argName */ true, /* hideOutputArguments */ false, /* addType */ false) + QLatin1String(", "));
+
+        result += spacing;
+
+        bool isVoid = method->callbackRetType() == QLatin1String("void");
+        QString outputVarName;
+
+        if (!isVoid) {
+            foreach (const CMethodArgument &argument, method->arguments) {
+                if (argument.direction() == CMethodArgument::Output) {
+                    outputVarName = argument.name();
+                    break;
+                }
+            }
+
+            result += QString(QLatin1String("%1 %2 = ")).arg(method->callbackRetType()).arg(outputVarName);
+        }
+
+        result += QString(QLatin1String("mInterface->mPriv->%1(%2&error);\n")).arg(method->callbackMember())
+                .arg(method->arguments.isEmpty() ? QString() : formatArguments(method, /* argName */ true, /* hideOutputArguments */ !isVoid, /* addType */ false) + QLatin1String(", "));
+
         result += spacing + QLatin1String("if (error.isValid()) {\n");
         result += spacing + spacing + QLatin1String("context->setFinishedWithError(error.name(), error.message());\n");
         result += spacing + spacing + QLatin1String("return;\n");
         result += spacing + QLatin1String("}\n");
-        result += spacing + QLatin1String("context->setFinished();\n");
+
+        if (isVoid) {
+            result += spacing + QLatin1String("context->setFinished();\n");
+        } else {
+            result += spacing + QString(QLatin1String("context->setFinished(%1);\n")).arg(outputVarName);
+        }
 
         result += QLatin1String("}\n");
         result += QLatin1Char('\n');
