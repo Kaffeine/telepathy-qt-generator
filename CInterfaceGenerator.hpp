@@ -26,6 +26,7 @@ public:
     CTypeFeature(const CTypeFeature &another) : CNameFeature(another), m_type(another.m_type) { }
 
     inline QString type() const { return m_type; }
+    inline QString typeSimplified() const { return m_typeSimplified; }
     inline QString defaultValue() const { return m_defaultValue; }
 
     void setTypeFromStr(const QString &type, const QString &tpType);
@@ -35,6 +36,7 @@ public:
 
 private:
     QString m_type;
+    QString m_typeSimplified;
     QString m_defaultValue;
 
 };

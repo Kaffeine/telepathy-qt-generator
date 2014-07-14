@@ -56,8 +56,13 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
     } else if (type == QLatin1String("ay")) {
         m_type = QLatin1String("QByteArray");
     } else if (type == QLatin1String("u")) {
-        m_type = QLatin1String("uint");
-        m_defaultValue = QLatin1String("0");
+        if (tpType == QLatin1String("Contact_Info_Flags")) {
+            m_type = QLatin1String("Tp::ContactInfoFlags");
+            m_typeSimplified = QLatin1String("uint");
+        } else {
+            m_type = QLatin1String("uint");
+            m_defaultValue = QLatin1String("0");
+        }
     } else if (type ==QLatin1String("b")) {
         m_type = QLatin1String("bool");
         m_defaultValue = QLatin1String("false");
@@ -75,6 +80,10 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
         } else {
             qDebug() << "Unknown type:" << type << tpType;
         }
+    }
+
+    if (m_typeSimplified.isEmpty()) {
+        m_typeSimplified = m_type;
     }
 }
 
@@ -434,7 +443,7 @@ QString CInterfaceGenerator::generateHeaderAdaptee() const
     result += spacing + QLatin1String("Q_OBJECT\n");
 
     foreach (const CInterfaceProperty *prop, m_properties) {
-        result += spacing + QString(QLatin1String("Q_PROPERTY(%1 %2 READ %2)\n")).arg(prop->type()).arg(prop->name());
+        result += spacing + QString(QLatin1String("Q_PROPERTY(%1 %2 READ %2)\n")).arg(prop->typeSimplified()).arg(prop->name());
     }
 
     result += QLatin1Char('\n');
@@ -446,7 +455,7 @@ QString CInterfaceGenerator::generateHeaderAdaptee() const
 
     if (!m_properties.isEmpty()) {
         foreach (const CInterfaceProperty *prop, m_properties) {
-            result += spacing + QString(QLatin1String("%1 %2() const;\n")).arg(prop->type()).arg(prop->name());
+            result += spacing + QString(QLatin1String("%1 %2() const;\n")).arg(prop->typeSimplified()).arg(prop->name());
         }
 
         result += QLatin1Char('\n');
@@ -508,7 +517,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
 
     // Properties
     foreach (const CInterfaceProperty *prop, m_properties) {
-        result += QString(QLatin1String("%1 %2::%3() const\n")).arg(prop->type()).arg(className).arg(prop->name());
+        result += QString(QLatin1String("%1 %2::%3() const\n")).arg(prop->typeSimplified()).arg(className).arg(prop->name());
         result += QLatin1String("{\n");
 //        result += spacing + QString(QLatin1String("return mInterface->mPriv->%1;\n")).arg(prop->name());
         result += spacing + QString(QLatin1String("return mInterface->%1();\n")).arg(prop->name());
