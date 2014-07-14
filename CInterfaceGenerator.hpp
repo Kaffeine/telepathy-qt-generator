@@ -137,17 +137,19 @@ public:
     void setType(const QString &interfaceType);
 
     void prepare();
-    QString generatePublicHeader() const;
-    QString generatePrivateHeader() const;
-    QString generateImplementation() const;
+    QString generateHeaderInterface() const;
+    QString generateHeaderAdaptee() const;
+
+    QString generateImplementationAdaptee() const;
+    QString generateImplementationPrivate() const;
+    QString generateImplementationInterface() const;
+
+    QString generateImplementations() const;
 
     QList<CInterfaceSignal*> m_signals;
     QList<CInterfaceProperty*> m_properties;
     QList<CInterfaceMethod*> m_methods;
 private:
-    QString generateImplementationAdaptee() const;
-    QString generateImplementationPrivate() const;
-    QString generateImplementationInterface() const;
 
     QString generateImmutablePropertiesListHelper(const int creatorSpacing, bool names, bool signatures) const;
     QString generatePrivateConstructorPropertiesList(const int creatorSpacing) const;

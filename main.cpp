@@ -105,11 +105,11 @@ void processSpec(const QString &fileName)
     printf("Generated code for %s spec\n\n", fileName.toLocal8Bit().constData());
 
     printf("--- Public header: ---\n");
-    printf("%s", generator.generatePublicHeader().toLocal8Bit().constData());
+    printf("%s", generator.generateHeaderInterface().toLocal8Bit().constData());
     printf("--- Private (internal) header: ---\n");
-    printf("%s", generator.generatePrivateHeader().toLocal8Bit().constData());
+    printf("%s", generator.generateHeaderAdaptee().toLocal8Bit().constData());
     printf("--- Source file: ---\n");
-    printf("%s", generator.generateImplementation().toLocal8Bit().constData());
+    printf("%s", generator.generateImplementations().toLocal8Bit().constData());
 }
 
 int main(int argc, char *argv[])

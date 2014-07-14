@@ -309,7 +309,7 @@ QString CInterfaceGenerator::generatePrivateConstructorPropertiesList(const int 
     return result;
 }
 
-QString CInterfaceGenerator::generatePublicHeader() const
+QString CInterfaceGenerator::generateHeaderInterface() const
 {
     QString result;
 
@@ -424,7 +424,7 @@ QString CInterfaceGenerator::generatePublicHeader() const
     return result;
 }
 
-QString CInterfaceGenerator::generatePrivateHeader() const
+QString CInterfaceGenerator::generateHeaderAdaptee() const
 {
     QString result;
 
@@ -481,7 +481,7 @@ QString CInterfaceGenerator::generatePrivateHeader() const
     return result;
 }
 
-QString CInterfaceGenerator::generateImplementation() const
+QString CInterfaceGenerator::generateImplementations() const
 {
     QString result;
 
