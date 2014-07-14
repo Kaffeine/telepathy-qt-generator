@@ -602,7 +602,7 @@ QString CInterfaceGenerator::generateImplementationPrivate() const
 
     // Methods
     foreach (const CInterfaceMethod *method, m_methods) {
-        result += spacing + QString(QLatin1String("%1 %2;\n")).arg(method->callback()).arg(method->callbackMember());
+        result += spacing + QString(QLatin1String("%1 %2;\n")).arg(method->callbackType()).arg(method->callbackMember());
     }
 
     result += spacing + QString(QLatin1String("%1::Adaptee *adaptee;\n")).arg(interfaceClassName());
@@ -714,7 +714,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
 
     // Methods
     foreach (const CInterfaceMethod *method, m_methods) {
-        result += QString(QLatin1String("void %1::set%2(const %1::%3 &cb)\n")).arg(interfaceClassName()).arg(method->callback()).arg(method->callback());
+        result += QString(QLatin1String("void %1::set%2Callback(const %1::%3 &cb)\n")).arg(interfaceClassName()).arg(method->nameFirstCapital()).arg(method->callbackType());
         result += QLatin1String("{\n");
         result += spacing + QString(QLatin1String("mPriv->%1 = cb;\n")).arg(method->callbackMember());
         result += QLatin1String("}\n");
@@ -785,14 +785,14 @@ QString CInterfaceGenerator::generateMethodCallbackAndDeclaration(const CInterfa
     QString result = spacing + QLatin1String("typedef Callback");
 
     if (method->arguments.isEmpty() || ((method->arguments.count() == 1) && method->arguments.first().direction() == CMethodArgument::Output)) {
-        result += QString(QLatin1String("1<%1, DBusError*> %2;\n")).arg(method->callbackRetType()).arg(method->callback());
+        result += QString(QLatin1String("1<%1, DBusError*> %2;\n")).arg(method->callbackRetType()).arg(method->callbackType());
     } else {
         result += QString(QLatin1String("%1<%2, %3, DBusError*> %4;\n"))
                 .arg(method->arguments.count() + (outputArgsIndices.isEmpty() ? 1 : 0))
-                .arg(method->callbackRetType()).arg(formatArguments(method, /* addName*/ false, /* hideOutputArguments */ true)).arg(method->callback());
+                .arg(method->callbackRetType()).arg(formatArguments(method, /* addName*/ false, /* hideOutputArguments */ true)).arg(method->callbackType());
     }
 
-    result += spacing + QString(QLatin1String("void set%1(const %1 &cb);\n")).arg(method->callback());
+    result += spacing + QString(QLatin1String("void set%1Callback(const %2 &cb);\n")).arg(method->nameFirstCapital()).arg(method->callbackType());
 
     if (method->arguments.isEmpty() || ((method->arguments.count() == 1) && method->arguments.first().direction() == CMethodArgument::Output)) {
         result += spacing + QString(QLatin1String("%1 %2(DBusError *error);\n")).arg(method->callbackRetType()).arg(method->name());

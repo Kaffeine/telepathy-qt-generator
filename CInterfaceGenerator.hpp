@@ -96,7 +96,7 @@ private:
 class CInterfaceMethod : public CNameFeature, public CArgumentsFeature  {
 public:
     CInterfaceMethod(const QString &name);
-    inline QString callback() const { return nameAsIs() + QLatin1String("Callback"); }
+    inline QString callbackType() const { return nameAsIs() + QLatin1String("Callback"); }
     inline QString callbackMember() const { return name() + QLatin1String("CB"); }
     inline QString callbackRetType() const { return m_callbackRetType; }
 
