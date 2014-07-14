@@ -543,7 +543,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
             result += QString(QLatin1String("%1 %2 = ")).arg(method->callbackRetType()).arg(outputVarName);
         }
 
-        result += QString(QLatin1String("mInterface->mPriv->%1(%2&error);\n")).arg(method->callbackMember())
+        result += QString(QLatin1String("mInterface->%1(%2&error);\n")).arg(method->name())
                 .arg(method->arguments.isEmpty() ? QString() : formatArguments(method, /* argName */ true, /* hideOutputArguments */ !isVoid, /* addType */ false) + QLatin1String(", "));
 
         result += spacing + QLatin1String("if (error.isValid()) {\n");
