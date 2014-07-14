@@ -473,7 +473,7 @@ QString CInterfaceGenerator::generatePrivateHeader() const
         result += QLatin1Char('\n');
     }
 
-    result += QLatin1String("public:\n");
+    result += QLatin1String("private:\n");
     result += spacing + QString(QLatin1String("%1 *mInterface;\n")).arg(interfaceClassName());
 
     result += QLatin1String("};\n");
