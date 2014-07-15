@@ -7,6 +7,9 @@
 
 #include "CInterfaceGenerator.hpp"
 
+static const bool skipDeprecatedEntries = true;
+static const QLatin1String s_deprecatedElement = QLatin1String("tp:deprecated");
+
 void processSpec(const QString &fileName)
 {
     QFile xmlFile(fileName);
@@ -42,12 +45,15 @@ void processSpec(const QString &fileName)
     QDomElement propertyElement = interfaceElement.firstChildElement(QLatin1String("property"));
 
     while (!propertyElement.isNull()) {
-        CInterfaceProperty *property = new CInterfaceProperty();
-        property->setName(propertyElement.attribute(QLatin1String("name")));
-        property->setTypeFromStr(propertyElement.attribute(QLatin1String("type")), propertyElement.attribute(QLatin1String("tp:type")));
-        property->setImmutable(propertyElement.attribute(QLatin1String("tp:immutable")) == QLatin1String("yes"));
+        if (skipDeprecatedEntries && propertyElement.firstChildElement(s_deprecatedElement).isNull()) {
+            // Element is *not* deprecated.
+            CInterfaceProperty *property = new CInterfaceProperty();
+            property->setName(propertyElement.attribute(QLatin1String("name")));
+            property->setTypeFromStr(propertyElement.attribute(QLatin1String("type")), propertyElement.attribute(QLatin1String("tp:type")));
+            property->setImmutable(propertyElement.attribute(QLatin1String("tp:immutable")) == QLatin1String("yes"));
 
-        generator.m_properties.append(property);
+            generator.m_properties.append(property);
+        }
 
         propertyElement = propertyElement.nextSiblingElement(QLatin1String("property"));
     }
@@ -56,22 +62,26 @@ void processSpec(const QString &fileName)
     QDomElement methodElement = interfaceElement.firstChildElement(QLatin1String("method"));
 
     while (!methodElement.isNull()) {
-        CInterfaceMethod *method = new CInterfaceMethod(methodElement.attribute(QLatin1String("name")));
+        if (skipDeprecatedEntries && methodElement.firstChildElement(s_deprecatedElement).isNull()) {
+            // Element is *not* deprecated.
 
-        QDomElement argElement = methodElement.firstChildElement(QLatin1String("arg"));
+            CInterfaceMethod *method = new CInterfaceMethod(methodElement.attribute(QLatin1String("name")));
 
-        while (!argElement.isNull()) {
-            CMethodArgument arg;
-            arg.setName(argElement.attribute(QLatin1String("name")));
-            arg.setTypeFromStr(argElement.attribute(QLatin1String("type")), argElement.attribute(QLatin1String("tp:type")));
-            arg.setDirection(argElement.attribute(QLatin1String("direction")));
+            QDomElement argElement = methodElement.firstChildElement(QLatin1String("arg"));
 
-            method->arguments.append(arg);
+            while (!argElement.isNull()) {
+                CMethodArgument arg;
+                arg.setName(argElement.attribute(QLatin1String("name")));
+                arg.setTypeFromStr(argElement.attribute(QLatin1String("type")), argElement.attribute(QLatin1String("tp:type")));
+                arg.setDirection(argElement.attribute(QLatin1String("direction")));
 
-            argElement = argElement.nextSiblingElement(QLatin1String("arg"));
+                method->arguments.append(arg);
+
+                argElement = argElement.nextSiblingElement(QLatin1String("arg"));
+            }
+
+            generator.m_methods.append(method);
         }
-
-        generator.m_methods.append(method);
 
         methodElement = methodElement.nextSiblingElement(QLatin1String("method"));
     }
@@ -80,22 +90,26 @@ void processSpec(const QString &fileName)
     QDomElement signalElement = interfaceElement.firstChildElement(QLatin1String("signal"));
 
     while (!signalElement.isNull()) {
-        CInterfaceSignal *signal = new CInterfaceSignal(signalElement.attribute(QLatin1String("name")));
+        if (skipDeprecatedEntries && signalElement.firstChildElement(s_deprecatedElement).isNull()) {
+            // Element is *not* deprecated.
 
-        QDomElement argElement = signalElement.firstChildElement(QLatin1String("arg"));
+            CInterfaceSignal *signal = new CInterfaceSignal(signalElement.attribute(QLatin1String("name")));
 
-        while (!argElement.isNull()) {
-            CMethodArgument arg;
-            arg.setName(argElement.attribute(QLatin1String("name")));
-            arg.setTypeFromStr(argElement.attribute(QLatin1String("type")), argElement.attribute(QLatin1String("tp:type")));
-            arg.setDirection(argElement.attribute(QLatin1String("direction")));
+            QDomElement argElement = signalElement.firstChildElement(QLatin1String("arg"));
 
-            signal->arguments.append(arg);
+            while (!argElement.isNull()) {
+                CMethodArgument arg;
+                arg.setName(argElement.attribute(QLatin1String("name")));
+                arg.setTypeFromStr(argElement.attribute(QLatin1String("type")), argElement.attribute(QLatin1String("tp:type")));
+                arg.setDirection(argElement.attribute(QLatin1String("direction")));
 
-            argElement = argElement.nextSiblingElement(QLatin1String("arg"));
+                signal->arguments.append(arg);
+
+                argElement = argElement.nextSiblingElement(QLatin1String("arg"));
+            }
+
+            generator.m_signals.append(signal);
         }
-
-        generator.m_signals.append(signal);
 
         signalElement = signalElement.nextSiblingElement(QLatin1String("signal"));
     }
