@@ -63,11 +63,19 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
             m_type = QLatin1String("uint");
             m_defaultValue = QLatin1String("0");
         }
-    } else if (type ==QLatin1String("b")) {
+    } else if (type == QLatin1String("b")) {
         m_type = QLatin1String("bool");
         m_defaultValue = QLatin1String("false");
-    } else if (type ==QLatin1String("a{sv}")) {
+    } else if (type == QLatin1String("a{sv}")) {
         m_type = QLatin1String("QVariantMap");
+    } else if (type == QLatin1String("a{us}")) {
+        if (tpType == QLatin1String("Avatar_Token_Map")) {
+            m_type = QLatin1String("Tp::AvatarTokenMap");
+        } else if (tpType == QLatin1String("Captcha_Answers")) {
+            m_type = QLatin1String("Tp::CaptchaAnswers");
+        } else {
+            m_type = QLatin1String("QMap<uint, QString>");
+        }
     } else {
         if (tpType == QLatin1String("Field_Spec[]") && type == QLatin1String("a(sasuu)")) {
             m_type = QLatin1String("Tp::FieldSpecs");
