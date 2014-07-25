@@ -73,8 +73,22 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
             m_type = QLatin1String("Tp::AvatarTokenMap");
         } else if (tpType == QLatin1String("Captcha_Answers")) {
             m_type = QLatin1String("Tp::CaptchaAnswers");
+        } else if (tpType == QLatin1String("Alias_Map")) {
+            m_type = QLatin1String("Tp::AliasMap");
         } else {
-            m_type = QLatin1String("QMap<uint, QString>");
+            qDebug() << "Unknown type:" << type << tpType;
+        }
+    } else if (type == QLatin1String("a{uu}")) {
+        if (tpType == QLatin1String("Chat_State_Map")) {
+            m_type = QLatin1String("Tp::ChatStateMap");
+        } else {
+            m_type = QLatin1String("QMap<uint, uint>");
+        }
+    } else if (type == QLatin1String("a(us)")) {
+        if (tpType == QLatin1String("Alias_Pair[]")) {
+            m_type = QLatin1String("Tp::AliasPair");
+        } else {
+            qDebug() << "Unknown type:" << type << tpType;
         }
     } else {
         if (tpType == QLatin1String("Field_Spec[]") && type == QLatin1String("a(sasuu)")) {
