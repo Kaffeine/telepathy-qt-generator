@@ -137,6 +137,11 @@ void CMethodArgument::setDirection(const QString &directionStr)
     }
 }
 
+bool CArgumentsFeature::isSimple() const
+{
+    return arguments.isEmpty() || ((arguments.count() == 1) && arguments.first().direction() == CMethodArgument::Output);
+}
+
 CInterfaceSignal::CInterfaceSignal(const QString &name) :
     CNameFeature(name),
     m_isNotifier(false)
@@ -498,9 +503,10 @@ QString CInterfaceGenerator::generateHeaderAdaptee() const
     if (!m_methods.isEmpty()) {
         result += QLatin1String("private Q_SLOTS:\n");
 
+
         foreach (const CInterfaceMethod *method, m_methods) {
             result += spacing + QString(QLatin1String("void %1(%2\n")).arg(method->name())
-                    .arg(method->arguments.isEmpty() ? QString() : formatArguments(method, /* name */ true, /* hideOutput */ true) + QLatin1String(","));
+                    .arg(method->isSimple() ? QString() : formatArguments(method, /* name */ true, /* hideOutput */ true) + QLatin1String(","));
             result += spacing + spacing + spacing + QString(QLatin1String("const Tp::Service::%1Interface%2Adaptor::%3ContextPtr &context);\n")).arg(interfaceType()).arg(name()).arg(method->nameAsIs());
         }
 
@@ -564,7 +570,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
     // Methods
     foreach (const CInterfaceMethod *method, m_methods) {
         result += QString(QLatin1String("void %1::%2(%3\n")).arg(className).arg(method->name())
-                .arg(method->arguments.isEmpty() ? QString() : formatArguments(method, /* name */ true, /* hideOutput */ true) + QLatin1String(","));
+                .arg(method->isSimple() ? QString() : formatArguments(method, /* name */ true, /* hideOutput */ true) + QLatin1String(","));
         result += spacing + spacing + QString(QLatin1String("const Tp::Service::%1Interface%2Adaptor::%3ContextPtr &context)\n")).arg(interfaceType()).arg(name()).arg(method->nameAsIs());
 
         result += QLatin1String("{\n");
@@ -589,7 +595,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
         }
 
         result += QString(QLatin1String("mInterface->%1(%2&error);\n")).arg(method->name())
-                .arg(method->arguments.isEmpty() ? QString() : formatArguments(method, /* argName */ true, /* hideOutputArguments */ !isVoid, /* addType */ false) + QLatin1String(", "));
+                .arg(method->isSimple() ? QString() : formatArguments(method, /* argName */ true, /* hideOutputArguments */ !isVoid, /* addType */ false) + QLatin1String(", "));
 
         result += spacing + QLatin1String("if (error.isValid()) {\n");
         result += spacing + spacing + QLatin1String("context->setFinishedWithError(error.name(), error.message());\n");
@@ -832,7 +838,7 @@ QString CInterfaceGenerator::generateMethodCallbackAndDeclaration(const CInterfa
 
     QString result = spacing + QLatin1String("typedef Callback");
 
-    if (method->arguments.isEmpty() || ((method->arguments.count() == 1) && method->arguments.first().direction() == CMethodArgument::Output)) {
+    if (method->isSimple()) {
         result += QString(QLatin1String("1<%1, DBusError*> %2;\n")).arg(method->callbackRetType()).arg(method->callbackType());
     } else {
         result += QString(QLatin1String("%1<%2, %3, DBusError*> %4;\n"))
@@ -842,7 +848,7 @@ QString CInterfaceGenerator::generateMethodCallbackAndDeclaration(const CInterfa
 
     result += spacing + QString(QLatin1String("void set%1Callback(const %2 &cb);\n")).arg(method->nameFirstCapital()).arg(method->callbackType());
 
-    if (method->arguments.isEmpty() || ((method->arguments.count() == 1) && method->arguments.first().direction() == CMethodArgument::Output)) {
+    if (method->isSimple()) {
         result += spacing + QString(QLatin1String("%1 %2(DBusError *error);\n")).arg(method->callbackRetType()).arg(method->name());
     } else {
         result += spacing + QString(QLatin1String("%1 %2(%3, DBusError *error);\n")).arg(method->callbackRetType()).arg(method->name()).arg(formatArguments(method, /* addName*/ true, /* hideOutputArguments */ true));

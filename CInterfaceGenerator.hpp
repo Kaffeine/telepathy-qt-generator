@@ -65,6 +65,7 @@ class CArgumentsFeature
 {
 public:
     QList<CMethodArgument> arguments;
+    bool isSimple() const;
 
 };
 
