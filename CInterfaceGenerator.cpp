@@ -771,9 +771,11 @@ QString CInterfaceGenerator::generateImplementationInterface() const
                 result += QString(QLatin1String("void %1::set%2(%3)\n")).arg(interfaceClassName()).arg(prop->nameFirstCapital()).arg(formatArguments(prop->notifier(), /* addName*/ true));
 
                 result += QLatin1String("{\n");
-                result += spacing + QString(QLatin1String("if (mPriv->%1 == %2) {\n")).arg(prop->name()).arg(prop->notifier()->arguments.first().name());;
-                result += spacing + spacing + QLatin1String("return;\n");
-                result += spacing + QLatin1String("}\n\n");
+                if (prop->notifier()->isSimple()) {
+                    result += spacing + QString(QLatin1String("if (mPriv->%1 == %2) {\n")).arg(prop->name()).arg(prop->notifier()->arguments.first().name());;
+                    result += spacing + spacing + QLatin1String("return;\n");
+                    result += spacing + QLatin1String("}\n\n");
+                }
                 result += spacing + QString(QLatin1String("mPriv->%1 = %2;\n")).arg(prop->name()).arg(prop->notifier()->arguments.first().name());;
                 if (compatibleWithQt4) {
                     result += spacing + QString(QLatin1String("QMetaObject::invokeMethod(mPriv->adaptee, \"%1\"%2); //Can simply use emit in Qt5\n"))
