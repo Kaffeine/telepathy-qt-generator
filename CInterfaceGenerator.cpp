@@ -670,7 +670,42 @@ QString CInterfaceGenerator::generateImplementationInterface() const
     QString creatorLine;
     QString creatorSpacingStr;
 
+    static const QLatin1String commentHeader = QLatin1String(
+                "/**\n"
+                " * \\class %1\n"
+                " * \\ingroup servicecm\n"
+                " * \\headerfile TelepathyQt/base-%2.h <TelepathyQt/Base%3>\n"
+                " *\n"
+                " * \\brief Base class for implementations of %4\n"
+                " */\n\n");
+
+    static const QLatin1String commentClassConstructor = QLatin1String(
+                "/**\n"
+                " * Class constructor.\n"
+                " */\n");
+
+    static const QLatin1String commentClassDestructor = QLatin1String(
+                "/**\n"
+                " * Class destructor.\n"
+                " */\n");
+
+    static const QLatin1String commentMethodImmutableProperties = QLatin1String(
+                "/**\n"
+                " * Return the immutable properties of this interface.\n"
+                " *\n"
+                " * Immutable properties cannot change after the interface has been registered\n"
+                " * on a service on the bus with registerInterface().\n"
+                " *\n"
+                " * \\return The immutable properties of this interface.\n"
+                " */\n");
+
+    const QString dottedName = node().replace(QLatin1Char('_'), QLatin1Char('.'));
+
+
+    result += QString(commentHeader).arg(interfaceClassName()).arg(interfaceType().toLower()).arg(interfaceType()).arg(dottedName);
+
     // Interface Constructor
+    result += commentClassConstructor;
     creatorLine = QString(QLatin1String("%1::%1(")).arg(interfaceClassName());
     result += creatorLine;
     result += generateImmutablePropertiesListHelper(creatorLine.size(), /* names */ true, /* signatures */ true);
@@ -693,6 +728,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
     result += QLatin1Char('\n');
 
     // Interface Destructor
+    result += commentClassDestructor;
     result += QString(QLatin1String("%1::~%1()\n")).arg(interfaceClassName());
     result += QLatin1String("{\n");
     result += spacing + QLatin1String("delete mPriv;\n");
@@ -700,7 +736,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
     result += QLatin1Char('\n');
 
     // Interface immutableProperties()
-
+    result += commentMethodImmutableProperties;
     result += QString(QLatin1String("QVariantMap %1::immutableProperties() const\n")).arg(interfaceClassName());
     result += QLatin1String("{\n");
     result += spacing + QLatin1String("QVariantMap map;\n");
