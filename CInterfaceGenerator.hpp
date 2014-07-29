@@ -35,6 +35,7 @@ public:
     QString formatArgument(bool addName) const;
 
 private:
+    QString supposeType(const QString &type, QString tpType) const;
     QString m_type;
     QString m_typeSimplified;
     QString m_defaultValue;

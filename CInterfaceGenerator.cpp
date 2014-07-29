@@ -53,14 +53,20 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
         m_type = QLatin1String("QString");
     } else if (type == QLatin1String("as")) {
         m_type = QLatin1String("QStringList");
+    } else if (type == QLatin1String("au")) {
+        m_type = QLatin1String("Tp::UIntList");
     } else if (type == QLatin1String("ay")) {
         m_type = QLatin1String("QByteArray");
     } else if (type == QLatin1String("u")) {
-        if (tpType == QLatin1String("Contact_Info_Flags")) {
-            m_type = QLatin1String("Tp::ContactInfoFlags");
-            m_typeSimplified = QLatin1String("uint");
-        } else {
-            m_type = QLatin1String("uint");
+        m_typeSimplified = QLatin1String("uint");
+
+        if (!tpType.endsWith(QLatin1String("Flags"))) {
+            m_type = m_typeSimplified;
+        }
+
+        if (tpType == QLatin1String("Contact_List_State")) {
+            m_defaultValue = QLatin1String("ContactListStateNone");
+        } else /*if (tpType == QLatin1String("Contact_Info_Flags"))*/ {
             m_defaultValue = QLatin1String("0");
         }
     } else if (type == QLatin1String("b")) {
@@ -68,40 +74,16 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
         m_defaultValue = QLatin1String("false");
     } else if (type == QLatin1String("a{sv}")) {
         m_type = QLatin1String("QVariantMap");
-    } else if (type == QLatin1String("a{us}")) {
-        if (tpType == QLatin1String("Avatar_Token_Map")) {
-            m_type = QLatin1String("Tp::AvatarTokenMap");
-        } else if (tpType == QLatin1String("Captcha_Answers")) {
-            m_type = QLatin1String("Tp::CaptchaAnswers");
-        } else if (tpType == QLatin1String("Alias_Map")) {
-            m_type = QLatin1String("Tp::AliasMap");
-        } else {
-            qDebug() << "Unknown type:" << type << tpType;
-        }
-    } else if (type == QLatin1String("a{uu}")) {
-        if (tpType == QLatin1String("Chat_State_Map")) {
-            m_type = QLatin1String("Tp::ChatStateMap");
-        } else {
-            m_type = QLatin1String("QMap<uint, uint>");
-        }
-    } else if (type == QLatin1String("a(us)")) {
-        if (tpType == QLatin1String("Alias_Pair[]")) {
-            m_type = QLatin1String("Tp::AliasPair");
-        } else {
-            qDebug() << "Unknown type:" << type << tpType;
-        }
     } else {
         if (tpType == QLatin1String("Field_Spec[]") && type == QLatin1String("a(sasuu)")) {
             m_type = QLatin1String("Tp::FieldSpecs");
-        } else if (tpType == QLatin1String("Contact_Info_Map") && type == QLatin1String("a{ua(sasas)}")) {
-            m_type = QLatin1String("Tp::ContactInfoMap");
-        } else if (tpType == QLatin1String("Contact_Handle[]") && type == QLatin1String("au")) {
-            m_type = QLatin1String("Tp::UIntList");
         } else if (tpType == QLatin1String("Contact_Info_Field[]") && type == QLatin1String("a(sasas)")) {
             m_type = QLatin1String("Tp::ContactInfoFieldList");
-        } else {
-            qDebug() << "Unknown type:" << type << tpType;
         }
+    }
+
+    if (m_type.isEmpty()) {
+        m_type = supposeType(type, tpType);
     }
 
     if (m_typeSimplified.isEmpty()) {
@@ -131,6 +113,13 @@ QString CTypeFeature::formatArgument(bool addName) const
     }
 
     return QString();
+}
+
+QString CTypeFeature::supposeType(const QString &type, QString tpType) const
+{
+    Q_UNUSED(type);
+
+    return QLatin1String("Tp::") + tpType.remove(QLatin1Char('_'));
 }
 
 void CMethodArgument::setDirection(const QString &directionStr)
