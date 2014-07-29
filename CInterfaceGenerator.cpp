@@ -77,8 +77,6 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
     } else {
         if (tpType == QLatin1String("Field_Spec[]") && type == QLatin1String("a(sasuu)")) {
             m_type = QLatin1String("Tp::FieldSpecs");
-        } else if (tpType == QLatin1String("Contact_Info_Field[]") && type == QLatin1String("a(sasas)")) {
-            m_type = QLatin1String("Tp::ContactInfoFieldList");
         }
     }
 
@@ -119,7 +117,13 @@ QString CTypeFeature::supposeType(const QString &type, QString tpType) const
 {
     Q_UNUSED(type);
 
-    return QLatin1String("Tp::") + tpType.remove(QLatin1Char('_'));
+    QString suffix;
+    if (tpType.endsWith(QLatin1String("[]"))) {
+        tpType.chop(2);
+        suffix = QLatin1String("List");
+    }
+
+    return QLatin1String("Tp::") + tpType.remove(QLatin1Char('_')) + suffix;
 }
 
 void CMethodArgument::setDirection(const QString &directionStr)
