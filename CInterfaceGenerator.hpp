@@ -126,6 +126,7 @@ public:
     QString interfacePtr() const;
     QString interfaceSubclass() const;
     QString interfaceType() const;
+    QString interfaceTypeShort() const;
 
     QString interfaceTpDefinition() const;
 
@@ -133,6 +134,8 @@ public:
 
     inline QString name() const { return m_name; }
     void setName(const QString &name);
+
+    QString shortName() const;
 
     inline QString node() const { return m_node; }
     void setNode(const QString &node);

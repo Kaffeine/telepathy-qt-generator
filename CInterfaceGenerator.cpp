@@ -214,6 +214,20 @@ QString CInterfaceGenerator::interfaceType() const
     }
 }
 
+QString CInterfaceGenerator::interfaceTypeShort() const
+{
+    switch (m_type) {
+    case InterfaceTypeChannel:
+        return QLatin1String("Chan");
+    case InterfaceTypeConnection:
+        return QLatin1String("Conn");
+    case InterfaceTypeProtocol:
+        return QLatin1String("Proto");
+    default:
+        return QString();
+    }
+}
+
 QString CInterfaceGenerator::interfaceTpDefinition() const
 {
     return QLatin1String("TP_QT_IFACE_") + node().toUpper();
@@ -234,6 +248,11 @@ CInterfaceGenerator::InterfaceType CInterfaceGenerator::strToType(const QString 
 void CInterfaceGenerator::setName(const QString &name)
 {
     m_name = name;
+}
+
+QString CInterfaceGenerator::shortName() const
+{
+    return QString(QLatin1String("%1.I.%2")).arg(interfaceTypeShort()).arg(name());
 }
 
 void CInterfaceGenerator::setNode(const QString &node)
@@ -508,6 +527,8 @@ QString CInterfaceGenerator::generateHeaderAdaptee() const
 QString CInterfaceGenerator::generateImplementations() const
 {
     QString result;
+
+    result += QLatin1String("// ") + shortName() + QLatin1Char('\n');
 
     result += generateImplementationPrivate();
     result += generateImplementationAdaptee();
