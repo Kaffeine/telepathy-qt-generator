@@ -101,7 +101,7 @@ void processSpec(const QString &fileName)
                 CMethodArgument arg;
                 arg.setName(argElement.attribute(QLatin1String("name")));
                 arg.setTypeFromStr(argElement.attribute(QLatin1String("type")), argElement.attribute(QLatin1String("tp:type")));
-                arg.setDirection(argElement.attribute(QLatin1String("direction")));
+                arg.setDirection(QLatin1String("out"));
 
                 signal->arguments.append(arg);
 
