@@ -117,6 +117,10 @@ QString CTypeFeature::supposeType(const QString &type, QString tpType) const
 {
     Q_UNUSED(type);
 
+    if (tpType.isEmpty()) {
+        qDebug() << "Can't suppose type: There is no tp-type tag. Type:" << type;
+    }
+
     QString suffix;
     if (tpType.endsWith(QLatin1String("[]"))) {
         tpType.chop(2);
