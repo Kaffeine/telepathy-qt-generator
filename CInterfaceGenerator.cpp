@@ -57,6 +57,10 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
         m_type = QLatin1String("Tp::UIntList");
     } else if (type == QLatin1String("ay")) {
         m_type = QLatin1String("QByteArray");
+    } else if (type == QLatin1String("ao")) {
+        m_type = QLatin1String("Tp::ObjectPathList");
+    } else if (type == QLatin1String("o")) {
+        m_type = QLatin1String("QDBusObjectPath");
     } else if (type == QLatin1String("u")) {
         m_typeSimplified = QLatin1String("uint");
 
