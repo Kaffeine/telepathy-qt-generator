@@ -98,7 +98,7 @@ bool CTypeFeature::isPod() const
     return (m_type == QLatin1String("uint")) || (m_type == QLatin1String("bool"));
 }
 
-QString CTypeFeature::formatArgument(bool addName) const
+QString CTypeFeature::formatTypeArgument(bool addName) const
 {
     if (isPod()) {
         if (addName) {
@@ -142,6 +142,19 @@ void CMethodArgument::setDirection(const QString &directionStr)
         m_direction = Output;
     } else {
         m_direction = Invalid;
+    }
+}
+
+QString CMethodArgument::formatArgument(bool addName) const
+{
+    if (m_direction == Output) {
+        if (addName) {
+            return QString(QLatin1String("%1 &%2")).arg(type()).arg(name());
+        } else {
+            return QString(QLatin1String("%1 &")).arg(type());
+        }
+    } else {
+        return formatTypeArgument(addName);
     }
 }
 
@@ -329,7 +342,7 @@ QString CInterfaceGenerator::generateImmutablePropertiesListHelper(const int cre
         }
 
         if (signatures) {
-            result += m_properties.at(i)->formatArgument(names);
+            result += m_properties.at(i)->formatTypeArgument(names);
         } else {
             // Assume it as names only
             result += m_properties.at(i)->name();
@@ -435,7 +448,7 @@ QString CInterfaceGenerator::generateHeaderInterface() const
             if (prop->notifier()) {
                 result += spacing + QString(QLatin1String("void set%1(%2);\n")).arg(prop->nameFirstCapital()).arg(formatArguments(prop->notifier(), /* addName*/ true));
             } else {
-                result += spacing + QString(QLatin1String("void set%1(%2);\n")).arg(prop->nameFirstCapital()).arg(prop->formatArgument(/* addName*/ true));
+                result += spacing + QString(QLatin1String("void set%1(%2);\n")).arg(prop->nameFirstCapital()).arg(prop->formatTypeArgument(/* addName*/ true));
             }
             result += QLatin1Char('\n');
         }
@@ -795,7 +808,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
                 result += QLatin1Char('\n');
 
             } else {
-                result += QString(QLatin1String("void %1::set%2(%3)\n")).arg(interfaceClassName()).arg(prop->nameFirstCapital()).arg(prop->formatArgument(/* addName*/ true));
+                result += QString(QLatin1String("void %1::set%2(%3)\n")).arg(interfaceClassName()).arg(prop->nameFirstCapital()).arg(prop->formatTypeArgument(/* addName*/ true));
 
                 result += QLatin1String("{\n");
                 result += spacing + QString(QLatin1String("mPriv->%1 = %1;\n")).arg(prop->name());
@@ -897,7 +910,7 @@ QString CInterfaceGenerator::generateMethodCallbackAndDeclaration(const CInterfa
     if (method->isSimple()) {
         result += spacing + QString(QLatin1String("%1 %2(DBusError *error);\n")).arg(method->callbackRetType()).arg(method->name());
     } else {
-        result += spacing + QString(QLatin1String("%1 %2(%3, DBusError *error);\n")).arg(method->callbackRetType()).arg(method->name()).arg(formatArguments(method, /* addName*/ true, /* hideOutputArguments */ true));
+        result += spacing + QString(QLatin1String("%1 %2(%3, DBusError *error);\n")).arg(method->callbackRetType()).arg(method->name()).arg(formatArguments(method, /* addName*/ true, /* hideOutputArguments */ false));
     }
 
     return result;

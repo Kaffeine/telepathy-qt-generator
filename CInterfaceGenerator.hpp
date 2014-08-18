@@ -32,7 +32,7 @@ public:
     void setTypeFromStr(const QString &type, const QString &tpType);
 
     bool isPod() const;
-    QString formatArgument(bool addName) const;
+    QString formatTypeArgument(bool addName) const;
 
 private:
     QString supposeType(const QString &type, QString tpType) const;
@@ -56,6 +56,8 @@ public:
     inline Direction direction() const { return m_direction; }
 
     void setDirection(const QString &directionStr);
+
+    QString formatArgument(bool addName) const;
 
 private:
     Direction m_direction;
