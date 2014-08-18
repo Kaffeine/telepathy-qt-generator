@@ -522,7 +522,7 @@ QString CInterfaceGenerator::generateHeaderAdaptee() const
     }
 
     if (!m_signals.isEmpty()) {
-        result += QLatin1String("signals:\n");
+        result += QLatin1String("Q_SIGNALS:\n");
         foreach (const CInterfaceSignal *sig, m_signals) {
             result += spacing + QString(QLatin1String("void %1(%2);\n")).arg(sig->name()).arg(formatArguments(sig, /* name */ true));
         }
