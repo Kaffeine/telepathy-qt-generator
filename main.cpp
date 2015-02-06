@@ -50,7 +50,7 @@ void processSpec(const QString &fileName)
     }
 
     CInterfaceGenerator generator;
-    generator.setName(interfaceNameParts.last());
+    generator.setFullName(interfaceName);
     generator.setType((partsOfName == BaseClass) ? QLatin1String("Base") : interfaceNameParts.at(3));
     generator.setNode(document.documentElement().attribute(QLatin1String("name")));
 

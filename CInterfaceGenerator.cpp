@@ -276,9 +276,13 @@ CInterfaceGenerator::InterfaceType CInterfaceGenerator::strToType(const QString 
     return InterfaceTypeInvalid;
 }
 
-void CInterfaceGenerator::setName(const QString &name)
+void CInterfaceGenerator::setFullName(const QString &name)
 {
-    m_name = name;
+    QStringList nameParts = name.split(QLatin1Char('.'));
+    m_name = nameParts.last();
+
+    nameParts = nameParts.mid(3);
+    m_fullName = nameParts.join(QLatin1Char('.'));
 }
 
 QString CInterfaceGenerator::shortName() const
@@ -737,10 +741,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
                 " * \\return The immutable properties of this interface.\n"
                 " */\n");
 
-    const QString dottedName = node().replace(QLatin1Char('_'), QLatin1Char('.'));
-
-
-    result += QString(commentHeader).arg(className()).arg(classBaseType().toLower()).arg(classBaseType()).arg(dottedName);
+    result += QString(commentHeader).arg(className()).arg(classBaseType().toLower()).arg(classBaseType()).arg(fullName());
 
     // Interface Constructor
     result += commentClassConstructor;

@@ -139,9 +139,10 @@ public:
     static InterfaceType strToType(const QString &str);
 
     inline QString interfaceName() const { return m_name; }
-    void setName(const QString &name);
+    void setFullName(const QString &name);
 
     QString shortName() const;
+    inline QString fullName() const { return m_fullName; }
 
     inline QString node() const { return m_node; }
     inline QString nodeName() const { return m_nodeName; }
@@ -174,6 +175,7 @@ private:
     QString m_node;
     QString m_nodeName;
     QString m_name;
+    QString m_fullName;
 
     int m_mutablePropertiesCount;
     int m_immutablePropertiesCount;
