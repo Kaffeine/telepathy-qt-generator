@@ -84,6 +84,11 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
         }
     }
 
+    // Not really correct. See https://bugs.freedesktop.org/show_bug.cgi?id=21690.
+    if (tpType == QLatin1String("Unix_Timestamp64")) {
+        m_type = QLatin1String("QDateTime");
+    }
+
     if (m_type.isEmpty()) {
         m_type = supposeType(type, tpType);
     }
