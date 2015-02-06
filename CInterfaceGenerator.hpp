@@ -128,25 +128,26 @@ public:
 
     CInterfaceGenerator();
 
-    QString interfaceClassName() const;
-    QString interfacePtr() const;
+    QString className() const;
+    QString classPtr() const;
     QString interfaceSubclass() const;
-    QString interfaceType() const;
+    QString classBaseType() const;
     QString interfaceTypeShort() const;
 
     QString interfaceTpDefinition() const;
 
     static InterfaceType strToType(const QString &str);
 
-    inline QString name() const { return m_name; }
+    inline QString interfaceName() const { return m_name; }
     void setName(const QString &name);
 
     QString shortName() const;
 
     inline QString node() const { return m_node; }
+    inline QString nodeName() const { return m_nodeName; }
     void setNode(const QString &node);
 
-    void setType(const QString &interfaceType);
+    void setType(const QString &classBaseType);
 
     void prepare();
     QString generateHeaderInterface() const;
@@ -171,6 +172,7 @@ private:
     QString formatInvokeMethodArguments(const CArgumentsFeature *argumentsClass) const;
     InterfaceType m_type;
     QString m_node;
+    QString m_nodeName;
     QString m_name;
 
     int m_mutablePropertiesCount;
