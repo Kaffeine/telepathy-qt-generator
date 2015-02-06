@@ -191,17 +191,17 @@ CInterfaceMethod::CInterfaceMethod(const QString &name) :
 
 void CInterfaceMethod::prepare()
 {
-    QList<uint> outputArgsIndices;
+    m_outputArgsIndices.clear();
 
     for (int i = 0; i < arguments.count(); ++i) {
         if (arguments.at(i).direction() == CMethodArgument::Output) {
-            outputArgsIndices.append(i);
+            m_outputArgsIndices.append(i);
         }
     }
 
     QString retType = QLatin1String("void");
-    if (outputArgsIndices.count() == 1) {
-        retType = arguments.at(outputArgsIndices.first()).type();
+    if (m_outputArgsIndices.count() == 1) {
+        retType = arguments.at(m_outputArgsIndices.first()).type();
     }
 
     m_callbackRetType = retType;
@@ -599,35 +599,37 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
         result += spacing + QString(QLatin1String("qDebug() << \"%1::%2\";\n")).arg(className).arg(method->name());
         result += spacing + QLatin1String("DBusError error;\n");
 
-        result += spacing;
+        QStringList outputVarNames;
 
-        bool isVoid = method->callbackRetType() == QLatin1String("void");
-        QString outputVarName;
+        foreach (int outputArgumentIndex, method->outputArgsIndices()) {
+            outputVarNames.append(method->arguments.at(outputArgumentIndex).name());
+        }
 
-        if (!isVoid) {
-            foreach (const CMethodArgument &argument, method->arguments) {
-                if (argument.direction() == CMethodArgument::Output) {
-                    outputVarName = argument.name();
-                    break;
+        if (method->outputArgsIndices().count() == 1) {
+            result += spacing + QString(QLatin1String("%1 %2 = ")).arg(method->callbackRetType()).arg(outputVarNames.first());
+        } else {
+            if (method->outputArgsIndices().count() > 1) {
+                foreach (int outputArgumentIndex, method->outputArgsIndices()) {
+                    const CMethodArgument &argument = method->arguments.at(outputArgumentIndex);
+                    result += spacing + QString(QLatin1String("%1 %2;\n")).arg(argument.type()).arg(argument.name());
                 }
-            }
 
-            result += QString(QLatin1String("%1 %2 = ")).arg(method->callbackRetType()).arg(outputVarName);
+                result += QLatin1Char('\n');
+            }
+            result += spacing;
         }
 
         result += QString(QLatin1String("mInterface->%1(%2&error);\n")).arg(method->name())
-                .arg(method->isSimple() ? QString() : formatArguments(method, /* argName */ true, /* hideOutputArguments */ !isVoid, /* addType */ false) + QLatin1String(", "));
+                .arg(method->isSimple() ? QString() : formatArguments(method, /* argName */ true,
+                                                                      /* hideOutputArguments */ (method->outputArgsIndices().count() == 1),
+                                                                      /* addType */ false) + QLatin1String(", "));
 
         result += spacing + QLatin1String("if (error.isValid()) {\n");
         result += spacing + spacing + QLatin1String("context->setFinishedWithError(error.name(), error.message());\n");
         result += spacing + spacing + QLatin1String("return;\n");
         result += spacing + QLatin1String("}\n");
 
-        if (isVoid) {
-            result += spacing + QLatin1String("context->setFinished();\n");
-        } else {
-            result += spacing + QString(QLatin1String("context->setFinished(%1);\n")).arg(outputVarName);
-        }
+        result += spacing + QString(QLatin1String("context->setFinished(%1);\n")).arg(outputVarNames.join(QLatin1String(", ")));
 
         result += QLatin1String("}\n");
         result += QLatin1Char('\n');

@@ -106,10 +106,13 @@ public:
     inline QString callbackMember() const { return name() + QLatin1String("CB"); }
     inline QString callbackRetType() const { return m_callbackRetType; }
 
+    QList<uint> outputArgsIndices() const { return m_outputArgsIndices; }
+
     void prepare();
 
 private:
     QString m_callbackRetType;
+    QList<uint> m_outputArgsIndices;
 
 };
 

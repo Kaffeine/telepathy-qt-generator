@@ -10,6 +10,11 @@
 static const bool skipDeprecatedEntries = true;
 static const QLatin1String s_deprecatedElement = QLatin1String("tp:deprecated");
 
+enum SpecType {
+    BaseClass = 4,
+    InterfaceClass = 6
+};
+
 void processSpec(const QString &fileName)
 {
     QFile xmlFile(fileName);
@@ -27,19 +32,26 @@ void processSpec(const QString &fileName)
     }
 
     const QStringList interfaceNameParts = interfaceName.split(QLatin1Char('.'));
-    if (interfaceNameParts.count() != 6) {
+
+    const int partsOfName = interfaceNameParts.count();
+
+    switch (partsOfName) {
+    case BaseClass: // Generic interface
+    case InterfaceClass: // Attached interface
+        break;
+    default:
         qDebug() << "File doesn't contain telepathy spec in known format (Error 2)";
         return;
     }
 
-    if (interfaceNameParts.at(4) != QLatin1String("Interface")) {
-        qDebug() << "Spec is not interface spec. (Error 3)";
+    if ((partsOfName == InterfaceClass) && (interfaceNameParts.at(4) != QLatin1String("Interface"))) {
+        qDebug() << "Spec is not valid interface spec. (Error 3)";
         return;
     }
 
     CInterfaceGenerator generator;
-    generator.setName(interfaceNameParts.at(5));
-    generator.setType(interfaceNameParts.at(3));
+    generator.setName(interfaceNameParts.last());
+    generator.setType((partsOfName == BaseClass) ? QLatin1String("Base") : interfaceNameParts.at(3));
     generator.setNode(document.documentElement().attribute(QLatin1String("name")));
 
     QDomElement propertyElement = interfaceElement.firstChildElement(QLatin1String("property"));
