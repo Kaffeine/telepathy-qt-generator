@@ -54,6 +54,14 @@ void processSpec(const QString &fileName)
     generator.setType((partsOfName == BaseClass) ? QLatin1String("Base") : interfaceNameParts.at(3));
     generator.setNode(document.documentElement().attribute(QLatin1String("name")));
 
+    const QDomElement annotationElement = interfaceElement.firstChildElement(QLatin1String("annotation"));
+    if (!annotationElement.isNull()) {
+        const QString annotationName = annotationElement.attribute(QLatin1String("name"));
+        if (annotationName == QLatin1String("org.freedesktop.DBus.Property.EmitsChangedSignal")) {
+            generator.setEmitPropertiesChangedSignal(true);
+        }
+    }
+
     QDomElement propertyElement = interfaceElement.firstChildElement(QLatin1String("property"));
 
     while (!propertyElement.isNull()) {

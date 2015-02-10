@@ -120,10 +120,10 @@ class CInterfaceGenerator
 {
 public:
     enum InterfaceType {
+        InterfaceTypeInvalid,
         InterfaceTypeChannel,
         InterfaceTypeConnection,
-        InterfaceTypeProtocol,
-        InterfaceTypeInvalid
+        InterfaceTypeProtocol
     };
 
     CInterfaceGenerator();
@@ -149,6 +149,7 @@ public:
     void setNode(const QString &node);
 
     void setType(const QString &classBaseType);
+    void setEmitPropertiesChangedSignal(bool enable);
 
     void prepare();
     QString generateHeaderInterface() const;
@@ -163,8 +164,8 @@ public:
     QList<CInterfaceSignal*> m_signals;
     QList<CInterfaceProperty*> m_properties;
     QList<CInterfaceMethod*> m_methods;
-private:
 
+private:
     QString generateImmutablePropertiesListHelper(const int creatorSpacing, bool names, bool signatures) const;
     QString generatePrivateConstructorPropertiesList(const int creatorSpacing) const;
     QString generateMethodCallbackAndDeclaration(const CInterfaceMethod *method) const;
@@ -179,6 +180,7 @@ private:
 
     int m_mutablePropertiesCount;
     int m_immutablePropertiesCount;
+    bool m_emitPropertiesChangedSignal;
 
 };
 

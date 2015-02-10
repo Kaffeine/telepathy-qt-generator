@@ -212,7 +212,11 @@ void CInterfaceMethod::prepare()
     m_callbackRetType = retType;
 }
 
-CInterfaceGenerator::CInterfaceGenerator()
+CInterfaceGenerator::CInterfaceGenerator() :
+    m_type(InterfaceTypeInvalid),
+    m_mutablePropertiesCount(0),
+    m_immutablePropertiesCount(0),
+    m_emitPropertiesChangedSignal(false)
 {
 }
 
@@ -308,6 +312,11 @@ void CInterfaceGenerator::setNode(const QString &node)
 void CInterfaceGenerator::setType(const QString &typeStr)
 {
     m_type = strToType(typeStr);
+}
+
+void CInterfaceGenerator::setEmitPropertiesChangedSignal(bool enable)
+{
+    m_emitPropertiesChangedSignal = enable;
 }
 
 void CInterfaceGenerator::prepare()
@@ -830,6 +839,10 @@ QString CInterfaceGenerator::generateImplementationInterface() const
 
                 result += QLatin1String("{\n");
                 result += spacing + QString(QLatin1String("mPriv->%1 = %1;\n")).arg(prop->name());
+
+                if (m_emitPropertiesChangedSignal) {
+                    result += spacing + QString(QLatin1String("notifyPropertyChanged(QLatin1String(\"%1\"), QVariant::fromValue(%2));\n")).arg(prop->nameAsIs()).arg(prop->name());
+                }
                 result += QLatin1String("}\n");
                 result += QLatin1Char('\n');
             }
