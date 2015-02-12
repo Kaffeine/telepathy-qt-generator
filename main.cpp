@@ -3,7 +3,6 @@
 #include <QFile>
 #include <QDomDocument>
 #include <QStringList>
-#include <QCoreApplication>
 
 #include "CInterfaceGenerator.hpp"
 
@@ -153,11 +152,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    QCoreApplication app(argc, argv);
-
-    static const QStringList arguments = app.arguments();
-
-    processSpec(arguments.at(1));
+    processSpec(QString::fromLocal8Bit(argv[1]));
 
     return 0;
 }

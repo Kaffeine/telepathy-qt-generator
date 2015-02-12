@@ -306,7 +306,6 @@ void CInterfaceGenerator::setNode(const QString &node)
         nameParts = nameParts.mid(2);
         m_nodeName = nameParts.join(QLatin1String(""));
     }
-    qDebug() << "node name:" << m_nodeName;
 }
 
 void CInterfaceGenerator::setType(const QString &typeStr)
