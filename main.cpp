@@ -43,14 +43,26 @@ void processSpec(const QString &fileName)
         return;
     }
 
-    if ((partsOfName == InterfaceClass) && (interfaceNameParts.at(4) != QLatin1String("Interface"))) {
-        qDebug() << "Spec is not valid interface spec. (Error 3)";
+    CInterfaceGenerator::InterfaceSubType subType = CInterfaceGenerator::InterfaceSubTypeInvalid;
+
+    if (partsOfName == BaseClass) {
+        subType = CInterfaceGenerator::InterfaceSubTypeBaseClass;
+    } else {
+        if (interfaceNameParts.at(4) == QLatin1String("Interface")) {
+            subType = CInterfaceGenerator::InterfaceSubTypeInterface;
+        }
+    }
+
+    if (subType == CInterfaceGenerator::InterfaceSubTypeInvalid) {
+        qDebug() << "Spec sub type is unknown. (Error 3)";
         return;
     }
 
     CInterfaceGenerator generator;
     generator.setFullName(interfaceName);
-    generator.setType((partsOfName == BaseClass) ? QLatin1String("Base") : interfaceNameParts.at(3));
+    generator.setType(interfaceNameParts.at(3));
+    generator.setSubType(subType);
+
     generator.setNode(document.documentElement().attribute(QLatin1String("name")));
 
     const QDomElement annotationElement = interfaceElement.firstChildElement(QLatin1String("annotation"));

@@ -123,13 +123,19 @@ public:
         InterfaceTypeInvalid,
         InterfaceTypeChannel,
         InterfaceTypeConnection,
-        InterfaceTypeProtocol,
-        InterfaceTypeBase
+        InterfaceTypeProtocol
+    };
+
+    enum InterfaceSubType {
+        InterfaceSubTypeInvalid,
+        InterfaceSubTypeBaseClass,
+        InterfaceSubTypeInterface
     };
 
     CInterfaceGenerator();
 
     QString className() const;
+    QString parentClassPrefix() const;
     QString classPtr() const;
     QString interfaceSubclass() const;
     QString classBaseType() const;
@@ -150,6 +156,7 @@ public:
     void setNode(const QString &node);
 
     void setType(const QString &classBaseType);
+    void setSubType(InterfaceSubType subType);
     void setEmitPropertiesChangedSignal(bool enable);
 
     void prepare();
@@ -176,6 +183,7 @@ private:
 
     QString m_adapteeParentMember;
     InterfaceType m_type;
+    InterfaceSubType m_subType;
     QString m_node;
     QString m_nodeName;
     QString m_name;
