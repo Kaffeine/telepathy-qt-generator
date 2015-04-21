@@ -941,7 +941,7 @@ QString CInterfaceGenerator::generateMethodCallbackAndDeclaration(const CInterfa
     if (method->isSimple()) {
         result += spacing + QString(QLatin1String("%1 %2(DBusError *error);\n")).arg(method->callbackRetType()).arg(method->name());
     } else {
-        result += spacing + QString(QLatin1String("%1 %2(%3, DBusError *error);\n")).arg(method->callbackRetType()).arg(method->name()).arg(formatArguments(method, /* addName*/ true, /* hideOutputArguments */ false));
+        result += spacing + QString(QLatin1String("%1 %2(%3, DBusError *error);\n")).arg(method->callbackRetType()).arg(method->name()).arg(formatArguments(method, /* addName*/ true, /* hideOutputArguments */ (outputArgsIndices.count() <= 1)));
     }
 
     return result;
