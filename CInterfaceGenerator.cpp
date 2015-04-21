@@ -863,7 +863,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
 
     result += QString(QLatin1String("void %1::createAdaptor()\n")).arg(className());
     result += QLatin1String("{\n");
-    result += spacing + QString(QLatin1String("(void) new Service::%1Interface%2Adaptor(dbusObject()->dbusConnection(),\n")).arg(classBaseType()).arg(interfaceName());
+    result += spacing + QString(QLatin1String("(void) new Service::%1Interface%2Adaptor(dbusObject()->dbusConnection(),\n")).arg(classBaseType()).arg(nodeName());
     result += spacing + spacing + spacing + QLatin1String("mPriv->adaptee, dbusObject());\n");
     result += QLatin1String("}\n");
     result += QLatin1Char('\n');
