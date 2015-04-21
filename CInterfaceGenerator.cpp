@@ -870,7 +870,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
 
     // Methods
     foreach (const CInterfaceMethod *method, m_methods) {
-        result += QString(QLatin1String("void %1::set%2Callback(const %1::%3 &cb)\n")).arg(className()).arg(method->nameFirstCapital()).arg(method->callbackType());
+        result += QString(QLatin1String("void %1::set%2Callback(const %3 &cb)\n")).arg(className()).arg(method->nameFirstCapital()).arg(method->callbackType());
         result += QLatin1String("{\n");
         result += spacing + QString(QLatin1String("mPriv->%1 = cb;\n")).arg(method->callbackMember());
         result += QLatin1String("}\n");
