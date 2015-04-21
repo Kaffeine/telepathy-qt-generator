@@ -123,7 +123,8 @@ public:
         InterfaceTypeInvalid,
         InterfaceTypeChannel,
         InterfaceTypeConnection,
-        InterfaceTypeProtocol
+        InterfaceTypeProtocol,
+        InterfaceTypeBase
     };
 
     CInterfaceGenerator();
@@ -172,6 +173,8 @@ private:
     QString formatArguments(const CArgumentsFeature *argumentsClass, bool argName, bool hideOutputArguments = false, bool addType = true) const;
     QString formatArgument(const CMethodArgument &arg, bool addName) const;
     QString formatInvokeMethodArguments(const CArgumentsFeature *argumentsClass) const;
+
+    QString m_adapteeParentMember;
     InterfaceType m_type;
     QString m_node;
     QString m_nodeName;

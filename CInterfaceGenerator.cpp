@@ -222,6 +222,9 @@ CInterfaceGenerator::CInterfaceGenerator() :
 
 QString CInterfaceGenerator::className() const
 {
+    if (m_type == InterfaceTypeBase) {
+        return QString(QLatin1String("%1%2")).arg(classBaseType()).arg(nodeName());
+    }
     return QString(QLatin1String("Base%1%2Interface")).arg(classBaseType()).arg(nodeName());
 }
 
@@ -244,6 +247,8 @@ QString CInterfaceGenerator::classBaseType() const
         return QLatin1String("Connection");
     case InterfaceTypeProtocol:
         return QLatin1String("Protocol");
+    case InterfaceTypeBase:
+        return QLatin1String("Base");
     default:
         return QString();
     }
@@ -276,6 +281,8 @@ CInterfaceGenerator::InterfaceType CInterfaceGenerator::strToType(const QString 
         return InterfaceTypeConnection;
     else if (str == QLatin1String("Protocol"))
         return InterfaceTypeProtocol;
+    else if (str == QLatin1String("Base"))
+        return InterfaceTypeBase;
 
     return InterfaceTypeInvalid;
 }
@@ -341,6 +348,12 @@ void CInterfaceGenerator::prepare()
 
     for (int i = 0; i < m_methods.count(); ++i) {
         m_methods.at(i)->prepare();
+    }
+
+    if (m_type == InterfaceTypeBase) {
+        m_adapteeParentMember = QLatin1Char('m') + nodeName();
+    } else {
+        m_adapteeParentMember = QLatin1String("mInterface");
     }
 }
 
@@ -571,7 +584,7 @@ QString CInterfaceGenerator::generateHeaderAdaptee() const
     }
 
     result += QLatin1String("private:\n");
-    result += spacing + QString(QLatin1String("%1 *mInterface;\n")).arg(className());
+    result += spacing + QString(QLatin1String("%1 *%2;\n")).arg(className()).arg(m_adapteeParentMember);
 
     result += QLatin1String("};\n");
 
@@ -600,7 +613,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
 
     result += QString(QLatin1String("%1::Adaptee(%2 *interface)\n")).arg(adapteeClassName).arg(className());
     result += spacing + QLatin1String(": QObject(interface),\n");
-    result += spacing + QLatin1String("  mInterface(interface)\n");
+    result += spacing + QString(QLatin1String("  %1(interface)\n")).arg(m_adapteeParentMember);
     result += QLatin1String("{\n}\n\n");
 
     result += QString(QLatin1String("%1::~Adaptee()\n")).arg(adapteeClassName);
@@ -610,8 +623,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
     foreach (const CInterfaceProperty *prop, m_properties) {
         result += QString(QLatin1String("%1 %2::%3() const\n")).arg(prop->typeSimplified()).arg(adapteeClassName).arg(prop->name());
         result += QLatin1String("{\n");
-//        result += spacing + QString(QLatin1String("return mInterface->mPriv->%1;\n")).arg(prop->name());
-        result += spacing + QString(QLatin1String("return mInterface->%1();\n")).arg(prop->name());
+        result += spacing + QString(QLatin1String("return %1->%2();\n")).arg(m_adapteeParentMember).arg(prop->name());
         result += QLatin1String("}\n");
         result += QLatin1Char('\n');
     }
@@ -647,7 +659,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
             result += spacing;
         }
 
-        result += QString(QLatin1String("mInterface->%1(%2&error);\n")).arg(method->name())
+        result += m_adapteeParentMember + QString(QLatin1String("->%1(%2&error);\n")).arg(method->name())
                 .arg(method->isSimple() ? QString() : formatArguments(method, /* argName */ true,
                                                                       /* hideOutputArguments */ (method->outputArgsIndices().count() == 1),
                                                                       /* addType */ false) + QLatin1String(", "));
