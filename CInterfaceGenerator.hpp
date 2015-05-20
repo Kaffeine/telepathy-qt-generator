@@ -129,6 +129,7 @@ public:
     enum InterfaceSubType {
         InterfaceSubTypeInvalid,
         InterfaceSubTypeBaseClass,
+        InterfaceSubTypeType,
         InterfaceSubTypeInterface
     };
 
@@ -140,6 +141,7 @@ public:
     QString interfaceSubclass() const;
     QString classBaseType() const;
     QString interfaceTypeShort() const;
+    QString subTypeStr() const;
 
     QString interfaceTpDefinition() const;
 
@@ -168,6 +170,8 @@ public:
     QString generateImplementationInterface() const;
 
     QString generateImplementations() const;
+
+    QString getServiceAdaptor() const;
 
     QList<CInterfaceSignal*> m_signals;
     QList<CInterfaceProperty*> m_properties;

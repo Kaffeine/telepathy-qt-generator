@@ -50,6 +50,8 @@ void processSpec(const QString &fileName)
     } else {
         if (interfaceNameParts.at(4) == QLatin1String("Interface")) {
             subType = CInterfaceGenerator::InterfaceSubTypeInterface;
+        } else if (interfaceNameParts.at(4) == QLatin1String("Type")) {
+            subType = CInterfaceGenerator::InterfaceSubTypeType;
         }
     }
 

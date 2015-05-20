@@ -261,10 +261,23 @@ CInterfaceGenerator::CInterfaceGenerator() :
 
 QString CInterfaceGenerator::className() const
 {
-    if (m_subType == InterfaceSubTypeBaseClass) {
+    QString classSuffix;
+
+    switch (m_subType) {
+    case InterfaceSubTypeBaseClass:
         return QString(QLatin1String("Base%1")).arg(classBaseType());
+        break;
+    case InterfaceSubTypeType:
+        classSuffix = QLatin1String("Type");
+        break;
+    case InterfaceSubTypeInterface:
+        classSuffix = QLatin1String("Interface");
+        break;
+    default:
+        break;
     }
-    return QString(QLatin1String("Base%1%2Interface")).arg(classBaseType()).arg(nodeName());
+
+    return QString(QLatin1String("Base%1%2%3")).arg(classBaseType()).arg(nodeName()).arg(classSuffix);
 }
 
 QString CInterfaceGenerator::parentClassPrefix() const
@@ -313,6 +326,20 @@ QString CInterfaceGenerator::interfaceTypeShort() const
     }
 }
 
+QString CInterfaceGenerator::subTypeStr() const
+{
+    switch (m_subType) {
+    case InterfaceSubTypeType:
+        return QLatin1String("Type");
+        break;
+    case InterfaceSubTypeInterface:
+        return QLatin1String("Interface");
+        break;
+    default:
+        return QString();
+    }
+}
+
 QString CInterfaceGenerator::interfaceTpDefinition() const
 {
     return QLatin1String("TP_QT_IFACE_") + node().toUpper();
@@ -341,10 +368,22 @@ void CInterfaceGenerator::setFullName(const QString &name)
 
 QString CInterfaceGenerator::shortName() const
 {
-    if (m_subType == InterfaceSubTypeBaseClass) {
+    QChar middleChar;
+
+    switch (m_subType) {
+    case InterfaceSubTypeBaseClass:
         return classBaseType();
+    case InterfaceSubTypeType:
+        middleChar = QLatin1Char('T');
+        break;
+    case InterfaceSubTypeInterface:
+        middleChar = QLatin1Char('I');
+        break;
+    default:
+        return QString();
+        break;
     }
-    return QString(QLatin1String("%1.I.%2")).arg(interfaceTypeShort()).arg(interfaceName());
+    return QString(QLatin1String("%1.%2.%3")).arg(interfaceTypeShort()).arg(middleChar).arg(interfaceName());
 }
 
 void CInterfaceGenerator::setNode(const QString &node)
@@ -525,7 +564,9 @@ QString CInterfaceGenerator::generateHeaderInterface() const
 
             result += spacing + QString(QLatin1String("%1 %2() const;\n")).arg(prop->type()).arg(prop->name());
         }
-        result += QLatin1Char('\n');
+        if (!result.endsWith(QLatin1String("\n\n"))) {
+            result += QLatin1Char('\n');
+        }
     }
 
     // Mutable properties
@@ -619,7 +660,7 @@ QString CInterfaceGenerator::generateHeaderAdaptee() const
         foreach (const CInterfaceMethod *method, m_methods) {
             result += spacing + QString(QLatin1String("void %1(%2\n")).arg(method->name())
                     .arg(method->isSimple() ? QString() : formatArguments(method, /* name */ true, /* hideOutput */ true) + QLatin1String(","));
-            result += spacing + spacing + spacing + QString(QLatin1String("const Tp::Service::%1Interface%2Adaptor::%3ContextPtr &context);\n")).arg(parentClassPrefix()).arg(nodeName()).arg(method->nameAsIs());
+            result += spacing + spacing + spacing + QString(QLatin1String("const %1::%2ContextPtr &context);\n")).arg(getServiceAdaptor()).arg(method->nameAsIs());
         }
 
         result += QLatin1Char('\n');
@@ -656,6 +697,11 @@ QString CInterfaceGenerator::generateImplementations() const
     return result;
 }
 
+QString CInterfaceGenerator::getServiceAdaptor() const
+{
+    return QString(QLatin1String("Tp::Service::%1%2%3Adaptor")).arg(parentClassPrefix()).arg(subTypeStr()).arg(nodeName());
+}
+
 QString CInterfaceGenerator::generateImplementationAdaptee() const
 {
     QString result;
@@ -683,7 +729,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
     foreach (const CInterfaceMethod *method, m_methods) {
         result += QString(QLatin1String("void %1::%2(%3\n")).arg(adapteeClassName).arg(method->name())
                 .arg(method->isSimple() ? QString() : formatArguments(method, /* name */ true, /* hideOutput */ true) + QLatin1String(","));
-        result += spacing + spacing + QString(QLatin1String("const Tp::Service::%1Interface%2Adaptor::%3ContextPtr &context)\n")).arg(parentClassPrefix()).arg(nodeName()).arg(method->nameAsIs());
+        result += spacing + spacing + QString(QLatin1String("const %1::%2ContextPtr &context)\n")).arg(getServiceAdaptor()).arg(method->nameAsIs());
 
         result += QLatin1String("{\n");
 
@@ -914,7 +960,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
 
     result += QString(QLatin1String("void %1::createAdaptor()\n")).arg(className());
     result += QLatin1String("{\n");
-    result += spacing + QString(QLatin1String("(void) new Service::%1Interface%2Adaptor(dbusObject()->dbusConnection(),\n")).arg(parentClassPrefix()).arg(nodeName());
+    result += spacing + QString(QLatin1String("(void) new %1(dbusObject()->dbusConnection(),\n")).arg(getServiceAdaptor());
     result += spacing + spacing + spacing + QLatin1String("mPriv->adaptee, dbusObject());\n");
     result += QLatin1String("}\n");
     result += QLatin1Char('\n');
