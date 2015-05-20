@@ -228,6 +228,11 @@ void CInterfaceProperty::setImmutable(bool newImmutable)
     m_immutable = newImmutable;
 }
 
+void CInterfaceProperty::setUnchangeable(bool newUnchangeable)
+{
+    m_unchangeable = newUnchangeable;
+}
+
 CInterfaceMethod::CInterfaceMethod(const QString &name) :
     CNameFeature(name)
 {
@@ -906,6 +911,11 @@ QString CInterfaceGenerator::generateImplementationInterface() const
     foreach (const CInterfaceProperty *prop, m_properties) {
         if (!prop->isImmutable()) {
             continue;
+        }
+
+        // Unchangeable properties considered as immutable, but should not be listed in this list
+        if (prop->isUnchangeable()) {
+//            continue;
         }
 
         result += creatorLine + QString(QLatin1String("%1 + QLatin1String(\".%2\"),\n")).arg(interfaceTpDefinition()).arg(prop->nameAsIs());

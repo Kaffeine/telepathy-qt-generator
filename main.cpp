@@ -85,12 +85,21 @@ void processSpec(const QString &fileName)
             property->setTypeFromStr(propertyElement.attribute(QLatin1String("type")), propertyElement.attribute(QLatin1String("tp:type")));
             property->setImmutable(propertyElement.attribute(QLatin1String("tp:immutable")) == QLatin1String("yes"));
 
+            QDomElement docString = propertyElement.firstChildElement(QLatin1String("tp:docstring"));
+            if (!docString.isNull()) {
+                QDomNodeList children = docString.childNodes();
+                for (int i = 0; i < children.count(); ++i) {
+                    if (children.at(i).toElement().text() == QLatin1String("This property cannot change during the lifetime of the channel.")) {
+                        property->setUnchangeable(true);
+                        break;
+                    }
+                }
+            }
             generator.m_properties.append(property);
         }
 
         propertyElement = propertyElement.nextSiblingElement(QLatin1String("property"));
     }
-
 
     QDomElement methodElement = interfaceElement.firstChildElement(QLatin1String("method"));
 

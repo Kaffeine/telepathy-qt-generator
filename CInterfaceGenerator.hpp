@@ -85,17 +85,19 @@ private:
 
 class CInterfaceProperty : public CTypeFeature {
 public:
-    CInterfaceProperty() : CTypeFeature(), m_notifier(0), m_immutable(false) { }
-    CInterfaceProperty(const CInterfaceProperty &prop) : CTypeFeature(prop), m_notifier(prop.m_notifier), m_immutable(prop.m_immutable) { }
+    CInterfaceProperty() : CTypeFeature(), m_notifier(0), m_immutable(false), m_unchangeable(false) { }
 
     inline CInterfaceSignal *notifier() const { return m_notifier; }
     void setNotifier(CInterfaceSignal *notifier);
-    inline bool isImmutable() const { return m_immutable; }
+    inline bool isImmutable() const { return m_immutable || m_unchangeable; }
+    inline bool isUnchangeable() const { return m_unchangeable; }
     void setImmutable(bool newImmutable);
+    void setUnchangeable(bool newUnchangeable);
 
 private:
     CInterfaceSignal *m_notifier;
     bool m_immutable;
+    bool m_unchangeable;
 
 };
 
