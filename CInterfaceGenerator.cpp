@@ -49,18 +49,17 @@ QString CNameFeature::nameFirstCapital() const
 
 void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
 {
-    if (type == QLatin1String("s")) {
-        m_type = QLatin1String("QString");
-    } else if (type == QLatin1String("as")) {
-        m_type = QLatin1String("QStringList");
-    } else if (type == QLatin1String("au")) {
-        m_type = QLatin1String("Tp::UIntList");
-    } else if (type == QLatin1String("ay")) {
-        m_type = QLatin1String("QByteArray");
-    } else if (type == QLatin1String("ao")) {
-        m_type = QLatin1String("Tp::ObjectPathList");
-    } else if (type == QLatin1String("o")) {
-        m_type = QLatin1String("QDBusObjectPath");
+    if (type == QLatin1String("b")) {
+        m_type = QLatin1String("bool");
+        m_defaultValue = QLatin1String("false");
+    } else if (type == QLatin1String("y")) {
+        m_type = QLatin1String("uchar");
+    } else if (type == QLatin1String("n")) {
+        m_type = QLatin1String("short");
+    } else if (type == QLatin1String("q")) {
+        m_type = QLatin1String("ushort");
+    } else if (type == QLatin1String("i")) {
+        m_type = QLatin1String("int");
     } else if (type == QLatin1String("u")) {
         m_typeSimplified = QLatin1String("uint");
 
@@ -73,9 +72,34 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
         } else /*if (tpType == QLatin1String("Contact_Info_Flags"))*/ {
             m_defaultValue = QLatin1String("0");
         }
-    } else if (type == QLatin1String("b")) {
-        m_type = QLatin1String("bool");
-        m_defaultValue = QLatin1String("false");
+    } else if (type == QLatin1String("x")) {
+        m_type = QLatin1String("qlonglong");
+    } else if (type == QLatin1String("t")) {
+        m_type = QLatin1String("qulonglong");
+    } else if (type == QLatin1String("d")) {
+        m_type = QLatin1String("double");
+    } else if (type == QLatin1String("s")) {
+        m_type = QLatin1String("QString");
+    } else if (type == QLatin1String("as")) {
+        m_type = QLatin1String("QStringList");
+    } else if (type == QLatin1String("au")) {
+        m_type = QLatin1String("Tp::UIntList");
+    } else if (type == QLatin1String("ay")) {
+        m_type = QLatin1String("QByteArray");
+    } else if (type == QLatin1String("o")) {
+        m_type = QLatin1String("QDBusObjectPath");
+    } else if (type == QLatin1String("ao")) {
+        m_type = QLatin1String("Tp::ObjectPathList");
+    } else if (type == QLatin1String("g")) {
+        m_type = QLatin1String("QDBusSignature");
+    } else if (type == QLatin1String("ag")) {
+        m_type = QLatin1String("Tp::SignatureList");
+    } else if (type == QLatin1String("v")) {
+        m_type = QLatin1String("QDBusVariant");
+    } else if (type == QLatin1String("av")) {
+        m_type = QLatin1String("QVariantList");
+    } else if (type == QLatin1String("aav")) {
+        m_type = QLatin1String("Tp::VariantListList");
     } else if (type == QLatin1String("a{sv}")) {
         m_type = QLatin1String("QVariantMap");
     } else {
@@ -89,6 +113,10 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
         m_type = QLatin1String("QDateTime");
     }
 
+    if (m_defaultValue.isEmpty() && isPod()) {
+        m_defaultValue == QLatin1String("0");
+    }
+
     if (m_type.isEmpty()) {
         m_type = supposeType(type, tpType);
     }
@@ -100,7 +128,18 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
 
 bool CTypeFeature::isPod() const
 {
-    return (m_type == QLatin1String("uint")) || (m_type == QLatin1String("bool"));
+    static const QStringList podTypes = QStringList()
+            << QLatin1String("bool")
+            << QLatin1String("uchar")
+            << QLatin1String("short")
+            << QLatin1String("ushort")
+            << QLatin1String("int")
+            << QLatin1String("uint")
+            << QLatin1String("qlonglong")
+            << QLatin1String("qulonglong")
+            << QLatin1String("double");
+
+    return podTypes.contains(m_type);
 }
 
 QString CTypeFeature::formatTypeArgument(bool addName) const
