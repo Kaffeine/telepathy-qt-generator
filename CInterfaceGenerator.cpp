@@ -919,7 +919,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
         }
 
         result += creatorLine + QString(QLatin1String("%1 + QLatin1String(\".%2\"),\n")).arg(interfaceTpDefinition()).arg(prop->nameAsIs());
-        result += creatorSpacingStr + QString(QLatin1String("QVariant::fromValue(mPriv->adaptee->%1()));\n")).arg(prop->name());
+        result += creatorSpacingStr + QString(QLatin1String("QVariant::fromValue(%1()));\n")).arg(prop->name());
     }
     result += spacing + QLatin1String("return map;\n");
     result += QLatin1String("}\n");
