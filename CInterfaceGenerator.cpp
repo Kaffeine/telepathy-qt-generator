@@ -114,7 +114,7 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
     }
 
     if (m_defaultValue.isEmpty() && isPod()) {
-        m_defaultValue == QLatin1String("0");
+        m_defaultValue = QLatin1String("0");
     }
 
     if (m_type.isEmpty()) {
