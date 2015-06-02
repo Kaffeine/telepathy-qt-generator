@@ -9,7 +9,7 @@ static bool compatibleWithQt4 = true;
 
 QString formatName(QString name)
 {
-    static const QStringList abs = QStringList() << QLatin1String("SASL") << QLatin1String("URI");
+    static const QStringList abs = QStringList() << QLatin1String("SASL") << QLatin1String("URI") << QLatin1String("MIME");
 
     int index = 0;
     foreach (const QString &abb, abs) {
