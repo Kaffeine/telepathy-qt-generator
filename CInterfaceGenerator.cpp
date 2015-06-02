@@ -996,19 +996,26 @@ QString CInterfaceGenerator::generateImplementationInterface() const
 
         checkStr += spacing + QLatin1String("}\n");
 
-        if (method->arguments.isEmpty() || ((method->arguments.count() == 1) && method->arguments.first().direction() == CMethodArgument::Output)) {
+        if (method->isSimple()) {
             result += QString(QLatin1String("%1 %2::%3(DBusError *error)\n"))
                     .arg(method->callbackRetType()).arg(className()).arg(method->name());
             result += checkStr;
             result += spacing + QString(QLatin1String("return mPriv->%1(error);\n")).arg(method->callbackMember());
-
         } else {
+            int outputArgsCount = 0;
+
+            for (int i = 0; i < method->arguments.count(); ++i) {
+                if (method->arguments.at(i).direction() == CMethodArgument::Output) {
+                    ++outputArgsCount;
+                }
+            }
+
             result += QString(QLatin1String("%1 %2::%3(%4, DBusError *error)\n"))
                     .arg(method->callbackRetType()).arg(className()).arg(method->name())
-                    .arg(formatArguments(method, /* addName*/ true, /* hideOutputArguments */ true));
+                    .arg(formatArguments(method, /* addName*/ true, /* hideOutputArguments */ (outputArgsCount <= 1)));
             result += checkStr;
             result += spacing + QString(QLatin1String("return mPriv->%1(%2, error);\n")).arg(method->callbackMember())
-                    .arg(formatArguments(method, /* addName*/ true, /* hideOutputArguments */ true, /* addType */ false));
+                    .arg(formatArguments(method, /* addName*/ true, /* hideOutputArguments */ (outputArgsCount <= 1), /* addType */ false));
         }
 
         result += QLatin1String("}\n");
