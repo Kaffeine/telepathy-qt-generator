@@ -17,7 +17,10 @@ enum SpecType {
 void processSpec(const QString &fileName)
 {
     QFile xmlFile(fileName);
-    xmlFile.open(QIODevice::ReadOnly);
+    if (!xmlFile.open(QIODevice::ReadOnly)) {
+        qDebug() << "Could not open file" << fileName;
+        return;
+    }
 
     QDomDocument document;
     document.setContent(xmlFile.readAll());
