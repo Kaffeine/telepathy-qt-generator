@@ -8,7 +8,6 @@ class CNameFeature {
 public:
     CNameFeature() { }
     CNameFeature(const QString &newName) { setName(newName); }
-    CNameFeature(const CNameFeature &another) : m_name(another.name()) { }
     inline QString name() const { return m_name; }
     inline QString nameAsIs() const { return m_nameAsIs; }
     QString nameFirstCapital() const;
@@ -23,7 +22,6 @@ private:
 class CTypeFeature : public CNameFeature {
 public:
     CTypeFeature() { }
-    CTypeFeature(const CTypeFeature &another) : CNameFeature(another), m_type(another.m_type) { }
 
     inline QString type() const { return m_type; }
     inline QString typeSimplified() const { return m_typeSimplified; }
@@ -51,7 +49,6 @@ public:
     };
 
     CMethodArgument() : CTypeFeature(), m_direction(Invalid) { }
-    CMethodArgument(const CMethodArgument &arg) : CTypeFeature(arg), m_direction(arg.m_direction) { }
 
     inline Direction direction() const { return m_direction; }
 
