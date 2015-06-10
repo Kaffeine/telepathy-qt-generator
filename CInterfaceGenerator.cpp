@@ -738,7 +738,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
 
         result += QLatin1String("{\n");
 
-        result += spacing + QString(QLatin1String("qDebug() << \"%1::%2\";\n")).arg(adapteeClassName).arg(method->name());
+        result += spacing + QString(QLatin1String("debug() << \"%1::%2\";\n")).arg(adapteeClassName).arg(method->name());
         result += spacing + QLatin1String("DBusError error;\n");
 
         QStringList outputVarNames;
