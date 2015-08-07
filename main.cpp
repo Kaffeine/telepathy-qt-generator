@@ -81,7 +81,7 @@ void processSpec(const QString &fileName)
     QDomElement propertyElement = interfaceElement.firstChildElement(QLatin1String("property"));
 
     while (!propertyElement.isNull()) {
-        if (skipDeprecatedEntries && propertyElement.firstChildElement(s_deprecatedElement).isNull()) {
+        if (!skipDeprecatedEntries || propertyElement.firstChildElement(s_deprecatedElement).isNull()) {
             // Element is *not* deprecated.
             CInterfaceProperty *property = new CInterfaceProperty();
             property->setName(propertyElement.attribute(QLatin1String("name")));
@@ -107,7 +107,7 @@ void processSpec(const QString &fileName)
     QDomElement methodElement = interfaceElement.firstChildElement(QLatin1String("method"));
 
     while (!methodElement.isNull()) {
-        if (skipDeprecatedEntries && methodElement.firstChildElement(s_deprecatedElement).isNull()) {
+        if (!skipDeprecatedEntries || methodElement.firstChildElement(s_deprecatedElement).isNull()) {
             // Element is *not* deprecated.
 
             CInterfaceMethod *method = new CInterfaceMethod(methodElement.attribute(QLatin1String("name")));
@@ -135,7 +135,7 @@ void processSpec(const QString &fileName)
     QDomElement signalElement = interfaceElement.firstChildElement(QLatin1String("signal"));
 
     while (!signalElement.isNull()) {
-        if (skipDeprecatedEntries && signalElement.firstChildElement(s_deprecatedElement).isNull()) {
+        if (!skipDeprecatedEntries || signalElement.firstChildElement(s_deprecatedElement).isNull()) {
             // Element is *not* deprecated.
 
             CInterfaceSignal *signal = new CInterfaceSignal(signalElement.attribute(QLatin1String("name")));
