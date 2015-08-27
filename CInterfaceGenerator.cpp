@@ -345,6 +345,18 @@ QString CInterfaceGenerator::subTypeStr() const
     }
 }
 
+QString CInterfaceGenerator::docGroup() const
+{
+    switch (m_type) {
+    case InterfaceTypeChannel:
+        return QLatin1String("servicechannel");
+    case InterfaceTypeConnection:
+        return QLatin1String("serviceconn");
+    default:
+        return QLatin1String("servicecm");
+    }
+}
+
 QString CInterfaceGenerator::interfaceTpDefinition() const
 {
     return QLatin1String("TP_QT_IFACE_") + node().toUpper();
@@ -838,10 +850,10 @@ QString CInterfaceGenerator::generateImplementationInterface() const
     static const QLatin1String commentHeader = QLatin1String(
                 "/**\n"
                 " * \\class %1\n"
-                " * \\ingroup servicecm\n"
-                " * \\headerfile TelepathyQt/base-%2.h <TelepathyQt/Base%3>\n"
+                " * \\ingroup %2\n"
+                " * \\headerfile TelepathyQt/base-%3.h <TelepathyQt/Base%4>\n"
                 " *\n"
-                " * \\brief Base class for implementations of %4\n"
+                " * \\brief Base class for implementations of %5\n"
                 " */\n\n");
 
     static const QLatin1String commentClassConstructor = QLatin1String(
@@ -864,7 +876,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
                 " * \\return The immutable properties of this interface.\n"
                 " */\n");
 
-    result += QString(commentHeader).arg(className()).arg(classBaseType().toLower()).arg(classBaseType()).arg(fullName());
+    result += QString(commentHeader).arg(className()).arg(docGroup()).arg(classBaseType().toLower()).arg(classBaseType()).arg(fullName());
 
     // Interface Constructor
     result += commentClassConstructor;

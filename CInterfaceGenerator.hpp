@@ -141,6 +141,7 @@ public:
     QString classBaseType() const;
     QString interfaceTypeShort() const;
     QString subTypeStr() const;
+    QString docGroup() const;
 
     QString interfaceTpDefinition() const;
 
