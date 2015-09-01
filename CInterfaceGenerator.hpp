@@ -24,7 +24,7 @@ public:
     CTypeFeature() { }
 
     inline QString type() const { return m_type; }
-    inline QString typeSimplified() const { return m_typeSimplified; }
+    inline QString typeForAdaptee() const { return m_typeForAdaptee; }
     inline QString defaultValue() const { return m_defaultValue; }
 
     void setTypeFromStr(const QString &type, const QString &tpType);
@@ -35,7 +35,7 @@ public:
 private:
     QString supposeType(const QString &type, QString tpType) const;
     QString m_type;
-    QString m_typeSimplified;
+    QString m_typeForAdaptee;
     QString m_defaultValue;
 
 };

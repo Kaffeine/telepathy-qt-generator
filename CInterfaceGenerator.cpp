@@ -61,10 +61,10 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
     } else if (type == QLatin1String("i")) {
         m_type = QLatin1String("int");
     } else if (type == QLatin1String("u")) {
-        m_typeSimplified = QLatin1String("uint");
+        m_typeForAdaptee = QLatin1String("uint");
 
         if (!tpType.endsWith(QLatin1String("Flags"))) {
-            m_type = m_typeSimplified;
+            m_type = m_typeForAdaptee;
         }
 
         if (tpType == QLatin1String("Contact_List_State")) {
@@ -121,8 +121,8 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
         m_type = supposeType(type, tpType);
     }
 
-    if (m_typeSimplified.isEmpty()) {
-        m_typeSimplified = m_type;
+    if (m_typeForAdaptee.isEmpty()) {
+        m_typeForAdaptee = m_type;
     }
 }
 
@@ -652,7 +652,7 @@ QString CInterfaceGenerator::generateHeaderAdaptee() const
     result += spacing + QLatin1String("Q_OBJECT\n");
 
     foreach (const CInterfaceProperty *prop, m_properties) {
-        result += spacing + QString(QLatin1String("Q_PROPERTY(%1 %2 READ %2)\n")).arg(prop->typeSimplified()).arg(prop->name());
+        result += spacing + QString(QLatin1String("Q_PROPERTY(%1 %2 READ %2)\n")).arg(prop->typeForAdaptee()).arg(prop->name());
     }
 
     result += QLatin1Char('\n');
@@ -664,7 +664,7 @@ QString CInterfaceGenerator::generateHeaderAdaptee() const
 
     if (!m_properties.isEmpty()) {
         foreach (const CInterfaceProperty *prop, m_properties) {
-            result += spacing + QString(QLatin1String("%1 %2() const;\n")).arg(prop->typeSimplified()).arg(prop->name());
+            result += spacing + QString(QLatin1String("%1 %2() const;\n")).arg(prop->typeForAdaptee()).arg(prop->name());
         }
 
         result += QLatin1Char('\n');
@@ -735,7 +735,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
 
     // Properties
     foreach (const CInterfaceProperty *prop, m_properties) {
-        result += QString(QLatin1String("%1 %2::%3() const\n")).arg(prop->typeSimplified()).arg(adapteeClassName).arg(prop->name());
+        result += QString(QLatin1String("%1 %2::%3() const\n")).arg(prop->typeForAdaptee()).arg(adapteeClassName).arg(prop->name());
         result += QLatin1String("{\n");
         result += spacing + QString(QLatin1String("return %1->%2();\n")).arg(m_adapteeParentMember).arg(prop->name());
         result += QLatin1String("}\n");
