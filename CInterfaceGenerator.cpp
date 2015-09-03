@@ -110,6 +110,7 @@ void CTypeFeature::setTypeFromStr(const QString &type, const QString &tpType)
 
     // Not really correct. See https://bugs.freedesktop.org/show_bug.cgi?id=21690.
     if (tpType == QLatin1String("Unix_Timestamp64")) {
+        m_typeForAdaptee = m_type;
         m_type = QLatin1String("QDateTime");
     }
 
@@ -231,6 +232,15 @@ void CInterfaceProperty::setImmutable(bool newImmutable)
 void CInterfaceProperty::setUnchangeable(bool newUnchangeable)
 {
     m_unchangeable = newUnchangeable;
+}
+
+QString CInterfaceProperty::dbusGetter() const
+{
+    if (type() == QLatin1String("QDateTime")) {
+        return name() + QLatin1String("().toTime_t()");
+    } else {
+        return name() + QLatin1String("()");
+    }
 }
 
 CInterfaceMethod::CInterfaceMethod(const QString &name) :
@@ -737,7 +747,7 @@ QString CInterfaceGenerator::generateImplementationAdaptee() const
     foreach (const CInterfaceProperty *prop, m_properties) {
         result += QString(QLatin1String("%1 %2::%3() const\n")).arg(prop->typeForAdaptee()).arg(adapteeClassName).arg(prop->name());
         result += QLatin1String("{\n");
-        result += spacing + QString(QLatin1String("return %1->%2();\n")).arg(m_adapteeParentMember).arg(prop->name());
+        result += spacing + QString(QLatin1String("return %1->%2;\n")).arg(m_adapteeParentMember).arg(prop->dbusGetter());
         result += QLatin1String("}\n");
         result += QLatin1Char('\n');
     }
@@ -931,7 +941,7 @@ QString CInterfaceGenerator::generateImplementationInterface() const
         }
 
         result += creatorLine + QString(QLatin1String("%1 + QLatin1String(\".%2\"),\n")).arg(interfaceTpDefinition()).arg(prop->nameAsIs());
-        result += creatorSpacingStr + QString(QLatin1String("QVariant::fromValue(%1()));\n")).arg(prop->name());
+        result += creatorSpacingStr + QString(QLatin1String("QVariant::fromValue(%1);\n")).arg(prop->dbusGetter());
     }
     result += spacing + QLatin1String("return map;\n");
     result += QLatin1String("}\n");

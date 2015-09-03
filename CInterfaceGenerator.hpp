@@ -91,6 +91,8 @@ public:
     void setImmutable(bool newImmutable);
     void setUnchangeable(bool newUnchangeable);
 
+    QString dbusGetter() const;
+
 private:
     CInterfaceSignal *m_notifier;
     bool m_immutable;
