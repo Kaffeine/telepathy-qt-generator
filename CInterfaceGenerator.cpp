@@ -387,6 +387,9 @@ CInterfaceGenerator::InterfaceType CInterfaceGenerator::strToType(const QString 
 void CInterfaceGenerator::setFullName(const QString &name)
 {
     QStringList nameParts = name.split(QLatin1Char('.'));
+    if (nameParts.last() == QLatin1String("DRAFT")) {
+        nameParts.removeLast();
+    }
     m_name = nameParts.last();
 
     nameParts = nameParts.mid(3);

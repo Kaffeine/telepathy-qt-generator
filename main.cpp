@@ -33,7 +33,10 @@ void processSpec(const QString &fileName)
         return;
     }
 
-    const QStringList interfaceNameParts = interfaceName.split(QLatin1Char('.'));
+    QStringList interfaceNameParts = interfaceName.split(QLatin1Char('.'));
+    if ((interfaceNameParts.count() > 1) && (interfaceNameParts.last() == QLatin1String("DRAFT"))) {
+        interfaceNameParts.removeLast();
+    }
 
     const int partsOfName = interfaceNameParts.count();
 
