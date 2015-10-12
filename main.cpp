@@ -9,11 +9,6 @@
 static const bool skipDeprecatedEntries = true;
 static const QLatin1String s_deprecatedElement = QLatin1String("tp:deprecated");
 
-enum SpecType {
-    BaseClass = 4,
-    InterfaceClass = 6
-};
-
 void processSpec(const QString &fileName)
 {
     QFile xmlFile(fileName);
@@ -33,43 +28,13 @@ void processSpec(const QString &fileName)
         return;
     }
 
-    QStringList interfaceNameParts = interfaceName.split(QLatin1Char('.'));
-    if ((interfaceNameParts.count() > 1) && (interfaceNameParts.last() == QLatin1String("DRAFT"))) {
-        interfaceNameParts.removeLast();
-    }
+    CInterfaceGenerator generator;
+    generator.setFullName(interfaceName);
 
-    const int partsOfName = interfaceNameParts.count();
-
-    switch (partsOfName) {
-    case BaseClass: // Generic interface
-    case InterfaceClass: // Attached interface
-        break;
-    default:
+    if (!generator.isValid()) {
         qDebug() << "File doesn't contain telepathy spec in known format (Error 2)";
         return;
     }
-
-    CInterfaceGenerator::InterfaceSubType subType = CInterfaceGenerator::InterfaceSubTypeInvalid;
-
-    if (partsOfName == BaseClass) {
-        subType = CInterfaceGenerator::InterfaceSubTypeBaseClass;
-    } else {
-        if (interfaceNameParts.at(4) == QLatin1String("Interface")) {
-            subType = CInterfaceGenerator::InterfaceSubTypeInterface;
-        } else if (interfaceNameParts.at(4) == QLatin1String("Type")) {
-            subType = CInterfaceGenerator::InterfaceSubTypeType;
-        }
-    }
-
-    if (subType == CInterfaceGenerator::InterfaceSubTypeInvalid) {
-        qDebug() << "Spec sub type is unknown. (Error 3)";
-        return;
-    }
-
-    CInterfaceGenerator generator;
-    generator.setFullName(interfaceName);
-    generator.setType(interfaceNameParts.at(3));
-    generator.setSubType(subType);
 
     generator.setNode(document.documentElement().attribute(QLatin1String("name")));
 

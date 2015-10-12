@@ -136,6 +136,8 @@ public:
 
     CInterfaceGenerator();
 
+    inline bool isValid() const { return m_subType != InterfaceSubTypeInvalid; }
+
     QString className() const;
     QString parentClassPrefix() const;
     QString classPtr() const;

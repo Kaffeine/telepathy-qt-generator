@@ -387,9 +387,22 @@ CInterfaceGenerator::InterfaceType CInterfaceGenerator::strToType(const QString 
 void CInterfaceGenerator::setFullName(const QString &name)
 {
     QStringList nameParts = name.split(QLatin1Char('.'));
+
+    if (nameParts.contains(QLatin1String("Interface"))) {
+        setSubType(InterfaceSubTypeInterface);
+    } else if (nameParts.contains(QLatin1String("Type"))) {
+        setSubType(InterfaceSubTypeType);
+    } else {
+        if (nameParts.count() == 4) { // Little heuristic
+            setSubType(InterfaceSubTypeBaseClass);
+        }
+    }
+
     if (nameParts.last() == QLatin1String("DRAFT")) {
         nameParts.removeLast();
     }
+    setType(nameParts.at(3));
+
     m_name = nameParts.last();
 
     nameParts = nameParts.mid(3);
