@@ -14,7 +14,7 @@ void processSpec(const QString &fileName)
 {
     QFile xmlFile(fileName);
     if (!xmlFile.open(QIODevice::ReadOnly)) {
-        qDebug() << "Could not open file" << fileName;
+        qCritical() << "Could not open file" << fileName;
         return;
     }
 
@@ -25,7 +25,7 @@ void processSpec(const QString &fileName)
     const QDomElement interfaceElement = document.documentElement().firstChildElement(QLatin1String("interface"));
     QString interfaceName = interfaceElement.attribute(QLatin1String("name"));
     if (!interfaceName.startsWith(s_specFormat0)) {
-        qDebug() << "File doesn't contain telepathy spec in known format (Error 1)";
+        qCritical() << "File doesn't contain telepathy spec in known format (Error 1)";
         return;
     }
 
@@ -33,7 +33,7 @@ void processSpec(const QString &fileName)
     generator.setFullName(interfaceName);
 
     if (!generator.isValid()) {
-        qDebug() << "File doesn't contain telepathy spec in known format (Error 2)";
+        qCritical() << "File doesn't contain telepathy spec in known format (Error 2)";
         return;
     }
 
