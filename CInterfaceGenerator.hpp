@@ -8,8 +8,8 @@ class CNameFeature {
 public:
     CNameFeature() { }
     CNameFeature(const QString &newName) { setName(newName); }
-    inline QString name() const { return m_name; }
-    inline QString nameAsIs() const { return m_nameAsIs; }
+    QString name() const { return m_name; }
+    QString nameAsIs() const { return m_nameAsIs; }
     QString nameFirstCapital() const;
 
     void setName(const QString &newName);
@@ -23,9 +23,9 @@ class CTypeFeature : public CNameFeature {
 public:
     CTypeFeature() { }
 
-    inline QString type() const { return m_type; }
-    inline QString typeForAdaptee() const { return m_typeForAdaptee; }
-    inline QString defaultValue() const { return m_defaultValue; }
+    QString type() const { return m_type; }
+    QString typeForAdaptee() const { return m_typeForAdaptee; }
+    QString defaultValue() const { return m_defaultValue; }
 
     void setTypeFromStr(const QString &type, const QString &tpType);
 
@@ -50,7 +50,7 @@ public:
 
     CMethodArgument() : CTypeFeature(), m_direction(Invalid) { }
 
-    inline Direction direction() const { return m_direction; }
+    Direction direction() const { return m_direction; }
 
     void setDirection(const QString &directionStr);
 
@@ -72,7 +72,7 @@ class CInterfaceSignal : public CNameFeature, public CArgumentsFeature {
 public:
     CInterfaceSignal(const QString &name);
 
-    inline bool isNotifier() const { return m_isNotifier; }
+    bool isNotifier() const { return m_isNotifier; }
     void setNotifierFlag(bool isNotifier);
 
 private:
@@ -84,10 +84,10 @@ class CInterfaceProperty : public CTypeFeature {
 public:
     CInterfaceProperty() : CTypeFeature(), m_notifier(0), m_immutable(false), m_unchangeable(false) { }
 
-    inline CInterfaceSignal *notifier() const { return m_notifier; }
+    CInterfaceSignal *notifier() const { return m_notifier; }
     void setNotifier(CInterfaceSignal *notifier);
-    inline bool isImmutable() const { return m_immutable || m_unchangeable; }
-    inline bool isUnchangeable() const { return m_unchangeable; }
+    bool isImmutable() const { return m_immutable || m_unchangeable; }
+    bool isUnchangeable() const { return m_unchangeable; }
     void setImmutable(bool newImmutable);
     void setUnchangeable(bool newUnchangeable);
 
@@ -103,9 +103,9 @@ private:
 class CInterfaceMethod : public CNameFeature, public CArgumentsFeature  {
 public:
     CInterfaceMethod(const QString &name);
-    inline QString callbackType() const { return nameAsIs() + QLatin1String("Callback"); }
-    inline QString callbackMember() const { return name() + QLatin1String("CB"); }
-    inline QString callbackRetType() const { return m_callbackRetType; }
+    QString callbackType() const { return nameAsIs() + QLatin1String("Callback"); }
+    QString callbackMember() const { return name() + QLatin1String("CB"); }
+    QString callbackRetType() const { return m_callbackRetType; }
 
     QList<uint> outputArgsIndices() const { return m_outputArgsIndices; }
 
@@ -136,7 +136,7 @@ public:
 
     CInterfaceGenerator();
 
-    inline bool isValid() const { return m_subType != InterfaceSubTypeInvalid; }
+    bool isValid() const { return m_subType != InterfaceSubTypeInvalid; }
 
     QString className() const;
     QString parentClassPrefix() const;
@@ -151,14 +151,14 @@ public:
 
     static InterfaceType strToType(const QString &str);
 
-    inline QString interfaceName() const { return m_name; }
+    QString interfaceName() const { return m_name; }
     void setFullName(const QString &name);
 
     QString shortName() const;
-    inline QString fullName() const { return m_fullName; }
+    QString fullName() const { return m_fullName; }
 
-    inline QString node() const { return m_node; }
-    inline QString nodeName() const { return m_nodeName; }
+    QString node() const { return m_node; }
+    QString nodeName() const { return m_nodeName; }
     void setNode(const QString &node);
 
     void setType(const QString &classBaseType);
