@@ -583,7 +583,13 @@ QString CInterfaceGenerator::generateHeaderInterface() const
     QString result;
 
     result += QLatin1String("class TP_QT_EXPORT ") + className();
-    result += QString(QLatin1String(" : public Abstract%1Interface\n{\n")).arg(parentClassPrefix());
+
+    if (m_subType == InterfaceSubTypeBaseClass) {
+        result += QLatin1String(" : public DBusService\n{\n");
+    } else {
+        result += QString(QLatin1String(" : public Abstract%1Interface\n{\n")).arg(parentClassPrefix());
+    }
+
     result += QString(QLatin1String("%1Q_OBJECT\n")).arg(spacing);
     result += QString(QLatin1String("%1Q_DISABLE_COPY(%2)\n\n")).arg(spacing).arg(className());
 
