@@ -123,6 +123,7 @@ public:
     enum class SpecFormat {
         Invalid,
         Classic,
+        V1,
     };
     enum InterfaceType {
         InterfaceTypeInvalid,

@@ -4,6 +4,7 @@
 #include <QDebug>
 
 static const QLatin1String s_specFormat0 = QLatin1String("org.freedesktop.Telepathy.");
+static const QLatin1String s_specFormat1 = QLatin1String("im.telepathy.v1.");
 
 static const QString spacing = QLatin1String("    ");
 
@@ -400,6 +401,8 @@ void CInterfaceGenerator::setFullName(const QString &name)
 {
     if (name.startsWith(s_specFormat0)) {
         m_specFormat = SpecFormat::Classic;
+    } else if (name.startsWith(s_specFormat1)) {
+        m_specFormat = SpecFormat::V1;
     } else {
         qDebug() << "Unable to recognize interface" << name;
         m_specFormat = SpecFormat::Invalid;
