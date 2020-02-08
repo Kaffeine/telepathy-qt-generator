@@ -120,6 +120,10 @@ private:
 class CInterfaceGenerator
 {
 public:
+    enum class SpecFormat {
+        Invalid,
+        Classic,
+    };
     enum InterfaceType {
         InterfaceTypeInvalid,
         InterfaceTypeChannel,
@@ -136,7 +140,8 @@ public:
 
     CInterfaceGenerator();
 
-    bool isValid() const { return m_subType != InterfaceSubTypeInvalid; }
+    SpecFormat specFormat() const;
+    bool isValid() const;
 
     QString className() const;
     QString parentClassPrefix() const;
@@ -196,7 +201,7 @@ private:
     QString m_nodeName;
     QString m_name;
     QString m_fullName;
-
+    SpecFormat m_specFormat = SpecFormat::Invalid;
     int m_mutablePropertiesCount;
     int m_immutablePropertiesCount;
     bool m_emitPropertiesChangedSignal;

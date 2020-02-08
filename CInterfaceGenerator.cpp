@@ -3,6 +3,8 @@
 #include <QStringList>
 #include <QDebug>
 
+static const QLatin1String s_specFormat0 = QLatin1String("org.freedesktop.Telepathy.");
+
 static const QString spacing = QLatin1String("    ");
 
 static bool compatibleWithQt4 = true;
@@ -274,6 +276,16 @@ CInterfaceGenerator::CInterfaceGenerator() :
 {
 }
 
+CInterfaceGenerator::SpecFormat CInterfaceGenerator::specFormat() const
+{
+    return m_specFormat;
+}
+
+bool CInterfaceGenerator::isValid() const
+{
+     return (m_specFormat != SpecFormat::Invalid) && (m_subType != InterfaceSubTypeInvalid);
+}
+
 QString CInterfaceGenerator::className() const
 {
     QString classSuffix;
@@ -386,6 +398,18 @@ CInterfaceGenerator::InterfaceType CInterfaceGenerator::strToType(const QString 
 
 void CInterfaceGenerator::setFullName(const QString &name)
 {
+    if (name.startsWith(s_specFormat0)) {
+        m_specFormat = SpecFormat::Classic;
+    } else {
+        qDebug() << "Unable to recognize interface" << name;
+        m_specFormat = SpecFormat::Invalid;
+    }
+
+    if (m_specFormat == SpecFormat::Invalid) {
+        qCritical() << "File doesn't contain telepathy spec in known format (Error 1)";
+        return;
+    }
+
     QStringList nameParts = name.split(QLatin1Char('.'));
 
     if (nameParts.contains(QLatin1String("Interface"))) {

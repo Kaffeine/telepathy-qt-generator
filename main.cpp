@@ -8,7 +8,6 @@
 
 static const bool skipDeprecatedEntries = true;
 static const QLatin1String s_deprecatedElement = QLatin1String("tp:deprecated");
-static const QLatin1String s_specFormat0 = QLatin1String("org.freedesktop.Telepathy.");
 
 void processSpec(const QString &fileName)
 {
@@ -24,16 +23,12 @@ void processSpec(const QString &fileName)
 
     const QDomElement interfaceElement = document.documentElement().firstChildElement(QLatin1String("interface"));
     QString interfaceName = interfaceElement.attribute(QLatin1String("name"));
-    if (!interfaceName.startsWith(s_specFormat0)) {
-        qCritical() << "File doesn't contain telepathy spec in known format (Error 1)";
-        return;
-    }
 
     CInterfaceGenerator generator;
     generator.setFullName(interfaceName);
 
     if (!generator.isValid()) {
-        qCritical() << "File doesn't contain telepathy spec in known format (Error 2)";
+        qCritical() << "File doesn't contain telepathy spec in known format (Error 1)";
         return;
     }
 
